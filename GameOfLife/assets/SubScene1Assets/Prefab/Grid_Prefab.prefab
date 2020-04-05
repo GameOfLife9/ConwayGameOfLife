@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "GridPrefab_Sprite",
+    "_name": "Grid_Prefab",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -33,15 +33,15 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 245,
-      "g": 9,
-      "b": 9,
+      "r": 200,
+      "g": 114,
+      "b": 114,
       "a": 255
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 40,
-      "height": 36
+      "width": 100,
+      "height": 100
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -52,15 +52,15 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        246.845,
-        396.375,
+        270.801,
+        508.634,
         0,
         0,
         0,
         0,
         1,
-        3,
-        3,
+        1,
+        1,
         1
       ]
     },
@@ -79,7 +79,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "CellNum_label",
+    "_name": "NUM_Text",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -116,15 +116,15 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        2.006,
+        0,
         0,
         0,
         0,
         0,
         0,
         1,
-        0.5,
-        0.5,
+        1,
+        1,
         1
       ]
     },
@@ -179,7 +179,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "48ixd5x3RPzqqFVDBb7jT/",
+    "fileId": "2461sURjdKZJq5ACf1wqas",
     "sync": false
   },
   {
@@ -200,8 +200,8 @@
     "_spriteFrame": {
       "__uuid__": "8cdb44ac-a3f6-449f-b354-7cd48cf84061"
     },
-    "_type": 0,
-    "_sizeMode": 1,
+    "_type": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -222,7 +222,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "459LViVZVNEbWoe72rq/Wy",
+    "fileId": "f10ZPO5qRLmLIFvK0FT1v+",
     "sync": false
   }
 ]

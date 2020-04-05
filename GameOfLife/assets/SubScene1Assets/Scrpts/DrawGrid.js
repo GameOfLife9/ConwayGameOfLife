@@ -8,8 +8,8 @@
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] https://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
-const ROWS=20;
-const COLUMNS=20;
+const ROWS=15;
+const COLUMNS=15;
 cc.Class({
     extends: cc.Component,
 
@@ -29,10 +29,10 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
-        gap:10,
+        gap:5,
         blockPrefab:cc.Prefab,
         bg:cc.Node,
-        faff:cc.Node
+        canvas:cc.Node,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -40,57 +40,57 @@ cc.Class({
     // onLoad () {},
 
     start () {
+        //get touch location
+        var self = this;
+        self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
+            var touches = event.getTouches();
+            var touchLoc = touches[0].getLocation();
+            console.log(touchLoc);
+           }, self);
+
+
+
         this.drawGrids();
-        this.testFun();
     },
     //varibles:
     //blocksize
     //positions
-    testFun:function() {
-        //faff.width=80;
-    },
-    drawGrids:function(){
-        console.log("drawGrids");
+    drawGrids(){
+        
+
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
+        console.log(this.blockSize);
         let x=this.gap+this.blockSize/2;
         let y=this.blockSize;
         this.positions=new Array();
+        this.blocks=new Array();
         for(let i=0;i<ROWS;i++){
             this.positions[i]=new Array();
+            this.blocks[i]=new Array();
             for(let j=0;j<COLUMNS;j++){
                 this.positions[i][j]=0;
             }
         }
-        console.log(this.positions);
-        console.log(this.positions.length);
-        //console.log(this.blockPrefab.Node.Size.width);
-        let block=cc.instantiate(this.blockPrefab);
-        console.log(block.width);
-        //block.width=this.blockSize;
-        //block.height=this.blockSize;
-        //console.log(block.width);
-        this.bg.addChild(block);
-        block.setPosition(cc.v2(x,y));
-        console.log(x,y);
-        this.positions[0][0]=cc.v2(x,y);
-       /* for( let i=0;i<ROWS;i++)
+        for( let i=0;i<ROWS;i++)
         {
-            //this.positions.push([0,0,0,0]);
             for(let j=0;j<COLUMNS;j++)
             {
                 let block=cc.instantiate(this.blockPrefab);
                 block.width=this.blockSize;
                 block.height=this.blockSize;
-                console.log(block.width);
                 this.bg.addChild(block);
                 block.setPosition(cc.v2(x,y));
+
                 this.positions[i][j]=cc.v2(x,y);
+                this.blocks[i][j]=block;
+
                 x+=this.gap+this.blockSize;
+                
                 //block.getComponent('block').setNumber(0);
             }
             y+=this.gap+this.blockSize;
             x=this.gap+this.blockSize/2;
-        }*/
+        }
     },
     // update (dt) {},
 });

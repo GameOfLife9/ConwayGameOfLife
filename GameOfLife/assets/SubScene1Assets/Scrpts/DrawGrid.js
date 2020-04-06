@@ -71,8 +71,9 @@ cc.Class({
         console.log(this.touchj);
 
         this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+        this.blocks[this.touchi][this.touchj].getComponent('NumText').setNumber(1);
         //this.blocks[this.touchi][this.touchj].label.string="3";
-       // let num_text=this.blocks[this.touchi][this.touchj].getComponentInChildren("NUM_Text");
+        //let num_text=this.blocks[this.touchi][this.touchj].getComponentInChildren("NUM_Text");
         //console.log(num_text.string);
        // num_text.string="3";
     },
@@ -100,6 +101,8 @@ cc.Class({
             {
                 //实例化prefab
                 let block=cc.instantiate(this.blockPrefab);
+
+               // block.getComponentInChildren("NUM_Text").String="2";
                 block.width=this.blockSize;
                 block.height=this.blockSize;
                 this.bg.addChild(block);

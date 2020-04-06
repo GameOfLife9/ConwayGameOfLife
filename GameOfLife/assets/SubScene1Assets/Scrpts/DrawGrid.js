@@ -39,18 +39,42 @@ cc.Class({
 
     // onLoad () {},
 
+    //varible list
+    //touchi touchj 碰到的方块的索引
+    //blockSize 方块大小 vec1
+    //blocks 方块实例数组
+    //
+
     start () {
-        //get touch location
+        this.drawGrids();
+
+         //获取碰到的方块的索引i j
         var self = this;
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
-            var touches = event.getTouches();
-            var touchLoc = touches[0].getLocation();
-            console.log(touchLoc);
+           this.touchedEvent(event);
            }, self);
+    },
+    touchedEvent(event){
+        var touches = event.getTouches();
+        var touchLoc = touches[0].getLocation();
 
+        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));
+        
+        
+        //可能存在错误
+        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap))-1;
+        if(this.touchj>14)
+        {
+            console.log("erro in touchedEvent function: thouchj over 14");
+        }
+        console.log(this.touchi);
+        console.log(this.touchj);
 
-
-        this.drawGrids();
+        this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+        //this.blocks[this.touchi][this.touchj].label.string="3";
+       // let num_text=this.blocks[this.touchi][this.touchj].getComponentInChildren("NUM_Text");
+        //console.log(num_text.string);
+       // num_text.string="3";
     },
     //varibles:
     //blocksize
@@ -59,9 +83,8 @@ cc.Class({
         
 
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
-        console.log(this.blockSize);
         let x=this.gap+this.blockSize/2;
-        let y=this.blockSize;
+        let y=this.gap+this.blockSize/2;
         this.positions=new Array();
         this.blocks=new Array();
         for(let i=0;i<ROWS;i++){
@@ -71,10 +94,11 @@ cc.Class({
                 this.positions[i][j]=0;
             }
         }
-        for( let i=0;i<ROWS;i++)
+        for( let j=0;j<ROWS;j++)
         {
-            for(let j=0;j<COLUMNS;j++)
+            for(let i=0;i<COLUMNS;i++)
             {
+                //实例化prefab
                 let block=cc.instantiate(this.blockPrefab);
                 block.width=this.blockSize;
                 block.height=this.blockSize;
@@ -84,6 +108,7 @@ cc.Class({
                 this.positions[i][j]=cc.v2(x,y);
                 this.blocks[i][j]=block;
 
+                //
                 x+=this.gap+this.blockSize;
                 
                 //block.getComponent('block').setNumber(0);

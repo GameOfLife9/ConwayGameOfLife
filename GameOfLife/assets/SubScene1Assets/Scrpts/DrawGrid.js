@@ -16,7 +16,7 @@ var ExitCell=new Array();
 for(let i=0;i<ROWS;i++){
     ExitCell[i]=new Array();
     for(let j=0;j<COLUMNS;j++){
-        ExitCell[i][j]=false;
+        ExitCell[i][j]=0;
     }
 }
 cc.Class({
@@ -72,15 +72,16 @@ cc.Class({
         
         //可能存在错误
         this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
-        if(this.touchj>14)
+        if(this.touchj<=14)
         {
-            console.log("erro in touchedEvent function: thouchj over 14");
+            console.log(this.touchi);
+            console.log(this.touchj);
+            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+            this.blocks[this.touchi][this.touchj].getComponent('NumText').setNumber(1);
         }
-        console.log(this.touchi);
-        console.log(this.touchj);
 
-        this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
-        this.blocks[this.touchi][this.touchj].getComponent('NumText').setNumber(1);
+
+
 
         console.log("asda",ExitCell);
     },
@@ -91,11 +92,11 @@ cc.Class({
             let n=GridData.level1DataStart[i].y;
             //TODO m n反了？
             this.blocks[m][n].color=cc.color(0,100,100,255);
-            ExitCell[m][n]=true;
+            ExitCell[m][n]=1;
         }
     },
     nextGenCell(){
-        ExitCell[0][0]=true;
+        //ExitCell[0][0]=true;
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
@@ -103,11 +104,28 @@ cc.Class({
                 let aroundNum=0;
                 for(let k=-1;k<=1;k++)
                 {
-                    for(let l=-1;l<1;l++)
+                    for(let l=-1;l<=1;l++)
                     {
-                        //TODO
+                        if((k!=0||l!=0)&&
+                            (i+k)>=0&&(i+k)<ROWS&&
+                            (j+l)>=0&&(j+l)<COLUMNS&&
+                            (ExitCell[i+k][j+l]!=0))//这行有问题，去掉正常
+                         {
+                                aroundNum++;
+                         }
                     }
                 }
+                //console.log(aroundNum);
+                ExitCell[i][j]=aroundNum;
+            }
+        }
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                if(ExitCell[i][j]!=0)
+                this.blocks[i][j].color=cc.color(0,100,100,255);
+                this.blocks[i][j].getComponent('NumText').setNumber(ExitCell[i][j]);
             }
         }
     },
@@ -159,7 +177,9 @@ cc.Class({
         console.log("level1");
         console.log(ExitCell);
     },
-    // update (dt) {},
+     update (dt) {
+         
+     },
 });
 
-exports.ExitCell=ExitCell;
+//exports.ExitCell=ExitCell;

@@ -2408,7 +2408,7 @@
         0,
         0,
         1,
-        2,
+        1.5,
         1.5,
         1
       ]
@@ -2573,7 +2573,7 @@
     "_useOriginalSize": false,
     "_string": "显示/隐藏通关要求",
     "_N$string": "显示/隐藏通关要求",
-    "_fontSize": 20,
+    "_fontSize": 10,
     "_lineHeight": 40,
     "_enableWrapText": false,
     "_N$file": null,

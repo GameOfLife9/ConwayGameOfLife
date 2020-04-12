@@ -1,17 +1,14 @@
-// Learn cc.Class:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] https://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 import * as GridData from 'GridData';
 const ROWS=15;
 const COLUMNS=15;
+var isshowNum=true;
+//当前关卡级数，用于loadLevel
+var level=0;
 
-
+//暂时变量，之后删掉
+var display=true;
+//exitcell用于判断格子i j是否有细胞
+//blocks用于存储细胞实体
 var ExitCell=new Array();
 for(let i=0;i<ROWS;i++){
     ExitCell[i]=new Array();
@@ -19,122 +16,270 @@ for(let i=0;i<ROWS;i++){
         ExitCell[i][j]=0;
     }
 }
+
+//cellNum实时存储细胞ij周围细胞数目
+var CellNum=new Array();
+for(let i=0;i<ROWS;i++){
+    CellNum[i]=new Array();
+    for(let j=0;j<COLUMNS;j++){
+        CellNum[i][j]=0;
+    }
+}
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
         gap:5,
+        //细胞预制件
         blockPrefab:cc.Prefab,
         bg:cc.Node,
+        levelLabel:cc.Label,
         canvas:cc.Node,
     },
-
-    // LIFE-CYCLE CALLBACKS:
-
-    // onLoad () {},
-
-    //varible list
-    //touchi touchj 碰到的方块的索引
-    //blockSize 方块大小 vec1
-    //blocks 方块实例数组
-    //
-
     start () {
         this.drawGrids();
 
-         //获取碰到的方块的索引i j
+         //获取触碰到的方块的索引i j
         var self = this;
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
            this.touchedEvent(event);
            }, self);
     },
-    touchedEvent(event){
-        var touches = event.getTouches();
-        var touchLoc = touches[0].getLocation();
-
-        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));
-        
-        
-        //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
-        if(this.touchj<=14)
-        {
-            console.log(this.touchi);
-            console.log(this.touchj);
-            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
-            this.blocks[this.touchi][this.touchj].getComponent('NumText').setNumber(1);
-        }
-
-
-
-
-        console.log("asda",ExitCell);
-    },
-    startDistri(){
-        for(let i=0;i<GridData.level1DataStart.length;i++)
-        {
-            let m=GridData.level1DataStart[i].x;
-            let n=GridData.level1DataStart[i].y;
-            //TODO m n反了？
-            this.blocks[m][n].color=cc.color(0,100,100,255);
-            ExitCell[m][n]=1;
-        }
-    },
-    nextGenCell(){
-        //ExitCell[0][0]=true;
+    //判断是否通关
+    judgeAccom(){
+        let isAccmp=true;
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                let aroundNum=0;
+                //如果当前格子没有细胞，但是通关要求此处有细胞，则未通关
+                if(ExitCell[i][j]==0){
+                    for(let k=0;k<GridData.levelsEnd[level].length;k++)
+                    {
+                        let m=GridData.levelsEnd[level][k].x;
+                        let n=GridData.levelsEnd[level][k].y;
+                        if(m==i&&n==j){
+                            isAccmp=false;
+                        }
+                    }
+                }
+                //如果当前格子有细胞，但是通关要求此处没有细胞，则未通关
+                else{
+                    let hasfind=false;
+                    for(let k=0;k<GridData.levelsEnd[level].length;k++)
+                    {
+                        let m=GridData.levelsEnd[level][k].x;
+                        let n=GridData.levelsEnd[level][k].y;
+                        if(m==i&&n==j){
+                            hasfind=true;
+                        }
+                    }
+                    if(hasfind==false){
+                        isAccmp=false;
+                    }
+                }
+            }
+        }
+        //如果通关，执行通关操作
+        console.log("通关？",isAccmp);
+        if(isAccmp==true){
+            this.accomplish();
+        }
+    },
+    //通关操作，载入下一关
+    accomplish(){
+        level++;
+        if(level<GridData.levelsEnd.length){
+            console.log("loadlevel");
+            this.loadlevel();
+        }          
+    },
+    //触摸事件
+    touchedEvent(event){
+        var touches = event.getTouches();
+        var touchLoc = touches[0].getLocation();
+
+        //获取触碰到的方块 i j
+        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
+        
+        //可能存在错误
+        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
+
+        if(this.touchj<ROWS)
+        {
+            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+            ExitCell[this.touchi][this.touchj]=1;
+        }
+
+        if(isshowNum==true)
+        {
+            this.showNum();
+        }
+        else{
+            this.hideNum();
+        }
+    },
+    //根据当前的ExitCell更新blocks
+    updateCells(){
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                if(ExitCell[i][j]==1)
+                {
+                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0);
+                }
+                else{
+                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0);
+                }         
+            }
+        }
+        if(isshowNum==true)
+        {
+            this.showNum();
+        }
+        else{
+            this.computeNumAround();
+            this.hideNum();
+        }
+    },
+    //显示或者隐藏通关要求
+    displayOrHideReq(){    
+        if(display){
+            for(let k=0;k<GridData.levelsEnd[level].length;k++)
+            {
+                let m=GridData.levelsEnd[level][k].x;
+                let n=GridData.levelsEnd[level][k].y;
+                
+                this.blocks[m][n].color=cc.color(50,10,150,255);
+            }
+            display=false;
+        }else{
+            this.updateCells();
+            display=true;
+        }
+
+    },
+    //载入关卡
+    loadlevel(){
+        //更新当前关卡，现在存在bug
+        this.levelLabel.String="关卡："+(level+1);
+        console.log(this.levelLabel.String);
+        //首先清零
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                this.blocks[i][j].color=cc.color(200,114,114,255);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
+                ExitCell[i][j]=0;             
+            }
+        }
+        //载入数据
+        for(let k=0;k<GridData.levelsStart[level].length;k++)
+        {
+            let m=GridData.levelsStart[level][k].x;
+            let n=GridData.levelsStart[level][k].y;
+            
+            this.blocks[m][n].color=cc.color(0,100,100,255);
+            ExitCell[m][n]=1;
+        }
+        //计算初始周围细胞数
+        this.computeNumAround();
+    },
+    //显示周围细胞数目
+    showNum(){
+        isshowNum=true;
+        this.computeNumAround();
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
+            }
+        }
+    },
+    //重新开始
+    resStart(){
+        this.loadlevel();
+    },
+    //隐藏周围细胞数目
+    hideNum(){
+        isshowNum=false;
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
+            }
+        }
+    },
+    //计算周围细胞数目
+    computeNumAround()
+    {
+        //暂时数组
+        let TempCell=new Array();
+        for(let i=0;i<ROWS;i++){
+            TempCell[i]=new Array();
+            for(let j=0;j<COLUMNS;j++){
+             TempCell[i][j]=0;
+            }
+        }
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                 let aroundNum=0;
                 for(let k=-1;k<=1;k++)
                 {
                     for(let l=-1;l<=1;l++)
                     {
+                        //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
                         if((k!=0||l!=0)&&
                             (i+k)>=0&&(i+k)<ROWS&&
                             (j+l)>=0&&(j+l)<COLUMNS&&
-                            (ExitCell[i+k][j+l]!=0))//这行有问题，去掉正常
+                            (ExitCell[i+k][j+l]!=0))
                          {
                                 aroundNum++;
                          }
                     }
                 }
-                //console.log(aroundNum);
-                ExitCell[i][j]=aroundNum;
+                TempCell[i][j]=aroundNum;
             }
         }
+        CellNum=TempCell;
+    },
+    //生成下一代细胞
+    nextGenCell(){
+        this.computeNumAround();
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                if(ExitCell[i][j]!=0)
-                this.blocks[i][j].color=cc.color(0,100,100,255);
-                this.blocks[i][j].getComponent('NumText').setNumber(ExitCell[i][j]);
+                //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
+                if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
+                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    ExitCell[i][j]=0;
+                }
+
+                //此处没有细胞，且周围细胞数为3，则生成一个细胞
+                if(ExitCell[i][j]==0&&CellNum[i][j]==3){
+                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    ExitCell[i][j]=1;
+                }              
             }
         }
+        if(isshowNum==true)
+        {
+            this.showNum();
+        }
+        else{
+            this.hideNum();
+        }
+        this.judgeAccom();
     },
-    changeBlock(){
-
-    },
-    //varibles:
-    //blocksize
-    //positions
     drawGrids(){
  
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
@@ -163,23 +308,17 @@ cc.Class({
                 this.positions[i][j]=cc.v2(x,y);
                 this.blocks[i][j]=block;
 
-                //
                 x+=this.gap+this.blockSize;
-                
-                //block.getComponent('block').setNumber(0);
             }
             y+=this.gap+this.blockSize;
             x=this.gap+this.blockSize/2;
         }
 
-
-        this.startDistri();
-        console.log("level1");
-        console.log(ExitCell);
+        this.loadlevel();
+        this.showNum();
     },
+    /*
      update (dt) {
          
-     },
+     },*/
 });
-
-//exports.ExitCell=ExitCell;

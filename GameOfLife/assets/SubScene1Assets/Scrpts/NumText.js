@@ -43,7 +43,11 @@ cc.Class({
             this.numberLabel.node.active=false;
         }
         else
+        {
+            this.numberLabel.node.active=true;
             this.numberLabel.string=number;
+        }
+            
     }
     // update (dt) {},
 });

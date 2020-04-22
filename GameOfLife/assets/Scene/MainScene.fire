@@ -646,8 +646,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "ToScene1",
-    "_N$string": "ToScene1",
+    "_string": "关卡模式",
+    "_N$string": "关卡模式",
     "_fontSize": 20,
     "_lineHeight": 40,
     "_enableWrapText": false,
@@ -1028,8 +1028,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "ToScene2",
-    "_N$string": "ToScene2",
+    "_string": "自由模式",
+    "_N$string": "自由模式",
     "_fontSize": 20,
     "_lineHeight": 40,
     "_enableWrapText": false,
@@ -1359,8 +1359,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 100,
-      "height": 40
+      "width": 150,
+      "height": 80
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1410,9 +1410,9 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "ToScene3",
-    "_N$string": "ToScene3",
-    "_fontSize": 20,
+    "_string": "模型鉴赏",
+    "_N$string": "模型鉴赏",
+    "_fontSize": 30,
     "_lineHeight": 40,
     "_enableWrapText": false,
     "_N$file": null,

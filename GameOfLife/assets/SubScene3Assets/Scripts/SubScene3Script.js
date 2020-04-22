@@ -1,9 +1,9 @@
+//ModelData存储模型坐标信息
 import * as ModelData from 'ModelData';
-const ROWS=15;
-const COLUMNS=15;
+var ROWS=15;
+var COLUMNS=15;
 var isshowNum=true;
 //当前关卡级数，用于loadLevel
-
 
 //暂时变量，之后删掉
 var display=true;
@@ -16,7 +16,7 @@ for(let i=0;i<ROWS;i++){
         ExitCell[i][j]=0;
     }
 }
-var isStartState=false;
+
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum=new Array();
 for(let i=0;i<ROWS;i++){
@@ -25,10 +25,13 @@ for(let i=0;i<ROWS;i++){
         CellNum[i][j]=0;
     }
 }
+var isStartState=false;
+
 var lasttime=0.0;
 var timegap=0.5;
 
-
+var centerx=0;
+var centery=0;
 cc.Class({
     extends: cc.Component,
 
@@ -38,8 +41,6 @@ cc.Class({
         bg:cc.Node,
         canvas:cc.Node,
     },
-
-    // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {},
 
@@ -113,13 +114,117 @@ cc.Class({
             }
         }
     },
+    //放大棋盘
+    scaleIncrease(){
+        //设置放大的上限为30*30
+        if(ROWS<30&&COLUMNS<30)
+        {
+            //用originData存储当前所有细胞的坐标值，以便缩放后进行重新计算
+            let originData=[];
+            let iter=0;
+            for(let i=0;i<(ROWS);i++){
+                for(let j=0;j<(COLUMNS);j++){
+                    if(ExitCell[i][j]==1)
+                    {
+                        //如果坐标i j处有细胞，我们就将此结果防止originData数组
+                        //注意，此处放回的数据重新以棋盘左下角为原点
+                        originData[iter]=cc.v2(i-centerx,j-centery);                       
+                        iter++;                   
+                    }
+                    //销毁所有blocks以便重新绘制
+                    this.blocks[i][j].destroy();
+                }
+            }
+            //放大，行列数加5
+            ROWS+=5;
+            COLUMNS+=5;
+            //将数组重新生成，匹配当前的行数和列数
+            for(let i=0;i<ROWS;i++){
+                ExitCell[i]=new Array();
+                CellNum[i]=new Array();
+                for(let j=0;j<COLUMNS;j++){
+                    ExitCell[i][j]=0;
+                    CellNum[i][j]=0;
+                }
+            }
+            //重新绘制棋盘
+            this.drawGrids();
+            //重新计算棋盘的中心点。
+            centerx=Math.floor(ROWS/2);
+            centery=Math.floor(COLUMNS/2);
+            for(let k=0;k<originData.length;k++)
+            {
+                let m=originData[k].x+centerx;
+                let n=originData[k].y+centery;
+                //TODO：为了保证数组不越界我做了限制，但实际上这存在错误，因为越界的信息丢失了
+                if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
+                {
+                    this.blocks[m][n].color=cc.color(0,100,100,255);
+                    ExitCell[m][n]=1;
+                }
+                else{
+                    console.log("Function Loadmodel out index");
+                }
+            }
+        }
+
+    },
+    //此处缩小函数的作用同放大函数
+    scaleDecrease(){
+        if(ROWS>15&&COLUMNS>15)
+        {
+            let originData=[];
+            let iter=0;
+            for(let i=0;i<(ROWS);i++){
+                for(let j=0;j<(COLUMNS);j++){
+                    if(ExitCell[i][j]==1)
+                    {
+                        originData[iter]=cc.v2(i-centerx,j-centery);                       
+                        iter++;                   
+                    }
+                    this.blocks[i][j].destroy();
+                }
+            }
+
+            ROWS-=5;
+            COLUMNS-=5;
+            for(let i=0;i<ROWS;i++){
+                ExitCell[i]=new Array();
+                for(let j=0;j<COLUMNS;j++){
+                    ExitCell[i][j]=0;
+                }
+            }
+
+            this.drawGrids();
+
+            centerx=Math.floor(ROWS/2);
+            centery=Math.floor(COLUMNS/2);
+            for(let k=0;k<originData.length;k++)
+            {
+                let m=originData[k].x+centerx;
+                let n=originData[k].y+centery;
+
+                if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
+                {
+                    this.blocks[m][n].color=cc.color(0,100,100,255);
+                    ExitCell[m][n]=1;
+                }
+                else{
+                    console.log("Function Loadmodel out index");
+                }
+            }
+        }
+
+    },
+    //载入模型，此处设为1
     loadModelButtonClicked(){
         this.loadModel(0);
     },
     loadModel(modelNum)
     {
-        let centerx=Math.floor(ROWS/2);
-        let centery=Math.floor(COLUMNS/2);
+        //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
+        centerx=Math.floor(ROWS/2);
+        centery=Math.floor(COLUMNS/2);
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
@@ -160,69 +265,71 @@ cc.Class({
         }
     },
         //计算周围细胞数目
-        computeNumAround()
-        {
-            //暂时数组
-            let TempCell=new Array();
-            for(let i=0;i<ROWS;i++){
-                TempCell[i]=new Array();
-                for(let j=0;j<COLUMNS;j++){
-                 TempCell[i][j]=0;
-                }
+    computeNumAround()
+    {
+        //暂时数组
+         let TempCell=new Array();
+        for(let i=0;i<ROWS;i++){
+            TempCell[i]=new Array();
+            for(let j=0;j<COLUMNS;j++){
+                TempCell[i][j]=0;
             }
-            for(let i=0;i<ROWS;i++)
+          }
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
             {
-                for(let j=0;j<COLUMNS;j++)
+                let aroundNum=0;
+                for(let k=-1;k<=1;k++)
                 {
-                     let aroundNum=0;
-                    for(let k=-1;k<=1;k++)
+                    for(let l=-1;l<=1;l++)
                     {
-                        for(let l=-1;l<=1;l++)
+                        //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
+                        if((k!=0||l!=0)&&
+                        (i+k)>=0&&(i+k)<ROWS&&
+                        (j+l)>=0&&(j+l)<COLUMNS&&
+                        (ExitCell[i+k][j+l]!=0))
                         {
-                            //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
-                            if((k!=0||l!=0)&&
-                                (i+k)>=0&&(i+k)<ROWS&&
-                                (j+l)>=0&&(j+l)<COLUMNS&&
-                                (ExitCell[i+k][j+l]!=0))
-                             {
-                                    aroundNum++;
-                             }
+                            aroundNum++;
                         }
                     }
+                }
                     TempCell[i][j]=aroundNum;
-                }
-            }
-            CellNum=TempCell;
-        },
-        //生成下一代细胞
-        nextGenCell(){
-            this.computeNumAround();
-            for(let i=0;i<ROWS;i++)
+             }
+        }
+         CellNum=TempCell;
+    },
+    //生成下一代细胞
+    nextGenCell(){
+        this.computeNumAround();
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
             {
-                for(let j=0;j<COLUMNS;j++)
-                {
-                    //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
-                    if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                        this.blocks[i][j].color=cc.color(200,114,114,255);
-                        ExitCell[i][j]=0;
-                    }
+                //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
+                if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
+                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    ExitCell[i][j]=0;
+                }
     
-                    //此处没有细胞，且周围细胞数为3，则生成一个细胞
-                    if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                        this.blocks[i][j].color=cc.color(0,100,100,255);
-                        ExitCell[i][j]=1;
-                    }              
-                }
+                //此处没有细胞，且周围细胞数为3，则生成一个细胞
+                if(ExitCell[i][j]==0&&CellNum[i][j]==3){
+                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    ExitCell[i][j]=1;
+                }              
             }
-            if(isshowNum==true)
-            {
-                this.showNum();
-            }
-            else{
-                this.hideNum();
-            }
-        },
+        }
+        if(isshowNum==true)
+        {
+            this.showNum();
+        }
+        else{
+            this.hideNum();
+        }
+    },
+    //这个函数是初始化棋盘的函数
     drawGrids(){
+        //动态地设置间隔
         this.gap=75.0/COLUMNS;
 
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
@@ -263,6 +370,7 @@ cc.Class({
         }
         this.showNum();
     },
+    //切换状态，=true时细胞自动繁殖至下一代，=false时停止
     startEndButtonClicked(){
         isStartState=!isStartState;
         console.log(isStartState);
@@ -270,6 +378,7 @@ cc.Class({
     returnButtonClicked:function(){
         cc.director.loadScene("MainScene"); 
     },
+    //清除所有细胞
     clearButton(){
         for(let i=0;i<ROWS;i++){
             for(let j=0;j<COLUMNS;j++){
@@ -280,7 +389,8 @@ cc.Class({
         this.nextGenCell();
         this.updateCells();
     },
-     update (dt) {
+    //细胞不停地繁殖，时间间隔为timegap，单位秒
+    update (dt) {
         lasttime+=dt;
         if(lasttime>timegap)
         {

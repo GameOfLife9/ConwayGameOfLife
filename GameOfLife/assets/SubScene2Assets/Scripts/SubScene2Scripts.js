@@ -1,5 +1,5 @@
-const ROWS=30;
-const COLUMNS=30;
+const ROWS=15;
+const COLUMNS=15;
 var isshowNum=true;
 //当前关卡级数，用于loadLevel
 
@@ -15,7 +15,7 @@ for(let i=0;i<ROWS;i++){
         ExitCell[i][j]=0;
     }
 }
-var isStartState=false;
+
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum=new Array();
 for(let i=0;i<ROWS;i++){
@@ -24,6 +24,8 @@ for(let i=0;i<ROWS;i++){
         CellNum[i][j]=0;
     }
 }
+var isStartState=false;
+
 var lasttime=0.0;
 var timegap=0.5;
 
@@ -124,69 +126,69 @@ cc.Class({
             }
         }
     },
-        //计算周围细胞数目
-        computeNumAround()
-        {
-            //暂时数组
-            let TempCell=new Array();
-            for(let i=0;i<ROWS;i++){
-                TempCell[i]=new Array();
-                for(let j=0;j<COLUMNS;j++){
-                 TempCell[i][j]=0;
-                }
+   //计算周围细胞数目
+   computeNumAround()
+   {
+       //暂时数组
+        let TempCell=new Array();
+       for(let i=0;i<ROWS;i++){
+           TempCell[i]=new Array();
+           for(let j=0;j<COLUMNS;j++){
+               TempCell[i][j]=0;
+           }
+         }
+       for(let i=0;i<ROWS;i++)
+       {
+           for(let j=0;j<COLUMNS;j++)
+           {
+               let aroundNum=0;
+               for(let k=-1;k<=1;k++)
+               {
+                   for(let l=-1;l<=1;l++)
+                   {
+                       //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
+                       if((k!=0||l!=0)&&
+                       (i+k)>=0&&(i+k)<ROWS&&
+                       (j+l)>=0&&(j+l)<COLUMNS&&
+                       (ExitCell[i+k][j+l]!=0))
+                       {
+                           aroundNum++;
+                       }
+                   }
+               }
+                   TempCell[i][j]=aroundNum;
             }
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
-                     let aroundNum=0;
-                    for(let k=-1;k<=1;k++)
-                    {
-                        for(let l=-1;l<=1;l++)
-                        {
-                            //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
-                            if((k!=0||l!=0)&&
-                                (i+k)>=0&&(i+k)<ROWS&&
-                                (j+l)>=0&&(j+l)<COLUMNS&&
-                                (ExitCell[i+k][j+l]!=0))
-                             {
-                                    aroundNum++;
-                             }
-                        }
-                    }
-                    TempCell[i][j]=aroundNum;
-                }
-            }
-            CellNum=TempCell;
-        },
-        //生成下一代细胞
-        nextGenCell(){
-            this.computeNumAround();
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
-                    //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
-                    if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                        this.blocks[i][j].color=cc.color(200,114,114,255);
-                        ExitCell[i][j]=0;
-                    }
-    
-                    //此处没有细胞，且周围细胞数为3，则生成一个细胞
-                    if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                        this.blocks[i][j].color=cc.color(0,100,100,255);
-                        ExitCell[i][j]=1;
-                    }              
-                }
-            }
-            if(isshowNum==true)
-            {
-                this.showNum();
-            }
-            else{
-                this.hideNum();
-            }
-        },
+       }
+        CellNum=TempCell;
+   },
+   //生成下一代细胞
+   nextGenCell(){
+       this.computeNumAround();
+       for(let i=0;i<ROWS;i++)
+       {
+           for(let j=0;j<COLUMNS;j++)
+           {
+               //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
+               if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
+                   this.blocks[i][j].color=cc.color(200,114,114,255);
+                   ExitCell[i][j]=0;
+               }
+   
+               //此处没有细胞，且周围细胞数为3，则生成一个细胞
+               if(ExitCell[i][j]==0&&CellNum[i][j]==3){
+                   this.blocks[i][j].color=cc.color(0,100,100,255);
+                   ExitCell[i][j]=1;
+               }              
+           }
+       }
+       if(isshowNum==true)
+       {
+           this.showNum();
+       }
+       else{
+           this.hideNum();
+       }
+   },
     drawGrids(){
         this.gap=75.0/COLUMNS;
 

@@ -1,5 +1,6 @@
-const ROWS=30;
-const COLUMNS=30;
+import * as ModelData from 'ModelData';
+const ROWS=15;
+const COLUMNS=15;
 var isshowNum=true;
 //当前关卡级数，用于loadLevel
 
@@ -111,6 +112,40 @@ cc.Class({
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
             }
         }
+    },
+    loadModelButtonClicked(){
+        this.loadModel(0);
+    },
+    loadModel(modelNum)
+    {
+        let centerx=Math.floor(ROWS/2);
+        let centery=Math.floor(COLUMNS/2);
+        //首先清零
+        for(let i=0;i<ROWS;i++)
+        {
+            for(let j=0;j<COLUMNS;j++)
+            {
+                this.blocks[i][j].color=cc.color(200,114,114,255);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
+                ExitCell[i][j]=0;             
+            }
+        }
+        //载入数据
+        for(let k=0;k<ModelData.modelDatas[modelNum].length;k++)
+        {
+            let m=ModelData.modelDatas[modelNum][k].x+centerx;
+            let n=ModelData.modelDatas[modelNum][k].y+centery;
+            if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
+            {
+                this.blocks[m][n].color=cc.color(0,100,100,255);
+                ExitCell[m][n]=1;
+            }
+            else{
+                console.log("Function Loadmodel out index");
+            }
+        }
+        //计算初始周围细胞数
+        this.computeNumAround();
     },
      //显示周围细胞数目
     showNum(){

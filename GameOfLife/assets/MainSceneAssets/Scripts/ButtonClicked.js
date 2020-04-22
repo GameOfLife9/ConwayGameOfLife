@@ -38,13 +38,15 @@ cc.Class({
     },
     Scene1ChangeButon:function()
     {
-        console.log("subscene");
         cc.director.loadScene("SubScene1");       
     },
     Scene2ChangeButon:function()
     {
-        console.log("subscene");
         cc.director.loadScene("SubScene2");       
+    },
+    Scene3ChangeButon:function()
+    {
+        cc.director.loadScene("SubScene3");       
     },
     // update (dt) {},
 });

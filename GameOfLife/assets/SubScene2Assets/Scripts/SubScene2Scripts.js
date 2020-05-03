@@ -155,8 +155,8 @@ cc.Class({
                            aroundNum++;
                        }
                    }
-               }
-                   TempCell[i][j]=aroundNum;
+                }
+                TempCell[i][j]=aroundNum;
             }
        }
         CellNum=TempCell;

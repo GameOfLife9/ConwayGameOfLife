@@ -1,5 +1,6 @@
 //ModelData存储模型坐标信息
 import * as ModelData from 'ModelData';
+import { modelName } from './ModelData';
 var ROWS=15;
 var COLUMNS=15;
 var isshowNum=true;
@@ -36,10 +37,18 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        
+        itemTemplate:{
+            default:null,
+            type:cc.Node
+        },
         blockPrefab:cc.Prefab,
         bg:cc.Node,
         canvas:cc.Node,
+        scrollviewback:cc.Node,
+        scrollView:{
+            default:null,
+            type:cc.ScrollView
+        },
     },
 
     // onLoad () {},
@@ -51,6 +60,7 @@ cc.Class({
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
            this.touchedEvent(event);
            }, self);
+           this.initLoadList();
     },
      //触摸事件
     touchedEvent(event){
@@ -264,7 +274,7 @@ cc.Class({
             }
         }
     },
-        //计算周围细胞数目
+    //计算周围细胞数目
     computeNumAround()
     {
         //暂时数组
@@ -299,8 +309,17 @@ cc.Class({
         }
          CellNum=TempCell;
     },
+    //返回上一代细胞
+    returnLastCell(){
+        if(this.lastCells!=null)
+        {
+            this.ExitCell=lastCells();
+            this.updateCells();
+        }
+    },
     //生成下一代细胞
     nextGenCell(){
+        this.lastCells=ExitCell;
         this.computeNumAround();
         for(let i=0;i<ROWS;i++)
         {
@@ -403,4 +422,30 @@ cc.Class({
         }
 
      },
+     //初始化载入模型列表
+    initLoadList(){
+        this.items=[];
+        this.spacing=20;
+        this.content=this.scrollView.content;
+        this.itemNum=modelName.length;
+        this.content.height=this.itemNum*(this.itemTemplate.height+this.spacing)+this.spacing;
+        for(let k=0;k<this.itemNum;k++){
+            let item=cc.instantiate(this.itemTemplate);
+            console.log(k);
+            item.getComponent('ItemButton').setNumAndName(k,ModelData.modelName[k]);
+            
+            this.content.addChild(item);
+            item.setPosition(0,-item.height*(k+0.5)-this.spacing*(k+1));
+            this.items.push(item);
+        }
+    },
+    showScorollView(){
+        this.scrollView.node.active=true;
+        this.scrollviewback.active=true;
+    },
+    //隐藏载入模型列表
+    disableScorollView(){
+        this.scrollView.node.active=false;
+        this.scrollviewback.active=false;
+    },
 });

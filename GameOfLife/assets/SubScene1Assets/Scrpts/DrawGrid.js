@@ -5,6 +5,8 @@ var isshowNum=true;
 //当前关卡级数，用于loadLevel
 var level=0;
 
+var stepUse=1;
+var available=1;
 //暂时变量，之后删掉
 var display=true;
 //exitcell用于判断格子i j是否有细胞
@@ -16,7 +18,13 @@ for(let i=0;i<ROWS;i++){
         ExitCell[i][j]=0;
     }
 }
-
+var lastCells=new Array();
+for(let i=0;i<ROWS;i++){
+    lastCells[i]=new Array();
+    for(let j=0;j<COLUMNS;j++){
+        lastCells[i][j]=0;
+    }
+}
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum=new Array();
 for(let i=0;i<ROWS;i++){
@@ -106,7 +114,12 @@ cc.Class({
         this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
 
         if(this.touchj<ROWS)
-        {
+        {          
+            for(let i=0;i<ROWS;i++){
+                for(let j=0;j<COLUMNS;j++){
+                    lastCells[i][j]=ExitCell[i][j];
+                }
+            }
             this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
             ExitCell[this.touchi][this.touchj]=1;
         }
@@ -164,8 +177,8 @@ cc.Class({
     },
     //载入关卡
     loadlevel(){
-        //更新当前关卡，现在存在bug
-        this.levelLabel.String="关卡："+(level+1);
+        //更新当前关卡
+        this.levelLabel.string="关卡："+(level+1);
         console.log(this.levelLabel.String);
         //首先清零
         for(let i=0;i<ROWS;i++)
@@ -251,8 +264,25 @@ cc.Class({
         }
         CellNum=TempCell;
     },
+    //返回上一代细胞
+    returnLastCell(){
+        if(lastCells!=null)
+        {
+            for(let i=0;i<ROWS;i++){
+                for(let j=0;j<COLUMNS;j++){
+                    ExitCell[i][j]=lastCells[i][j];
+                }
+            }
+            this.updateCells();
+        }
+    },
     //生成下一代细胞
     nextGenCell(){
+        for(let i=0;i<ROWS;i++){
+            for(let j=0;j<COLUMNS;j++){
+                lastCells[i][j]=ExitCell[i][j];
+            }
+        }
         this.computeNumAround();
         for(let i=0;i<ROWS;i++)
         {
@@ -281,7 +311,6 @@ cc.Class({
         this.judgeAccom();
     },
     drawGrids(){
- 
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
         let x=this.gap+this.blockSize/2;
         let y=this.gap+this.blockSize/2;

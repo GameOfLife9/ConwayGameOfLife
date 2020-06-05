@@ -9,6 +9,7 @@ var surviveNums=[];
 var bornNums=[];
 //存放模型名字
 var modelName=[];
+
 ///////////////////////////////////////////////////模型1
 //存放模型1分布
 var model1Data=[];

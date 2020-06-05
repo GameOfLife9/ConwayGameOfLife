@@ -74,7 +74,6 @@ cc.Class({
                 this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
                 ExitCell[this.touchi][this.touchj]=1;
             }
-
         }
 
         if(isshowNum==true)

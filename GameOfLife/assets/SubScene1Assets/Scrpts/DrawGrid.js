@@ -44,6 +44,9 @@ cc.Class({
         levelLabel:cc.Label,
         availableLabel:cc.Label,
         canvas:cc.Node,
+        showHideNumButton:cc.Button,
+        ShowHideButtonLabel:cc.Label,
+        ShowRequireButtonLabel:cc.Label,
     },
     start () {
         this.drawGrids();
@@ -112,7 +115,7 @@ cc.Class({
         this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
         
         //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
+        this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
 
         if(this.touchj<ROWS&&available>0)
         {          
@@ -164,6 +167,7 @@ cc.Class({
     //显示或者隐藏通关要求
     displayOrHideReq(){    
         if(display){
+            this.ShowRequireButtonLabel.string="隐藏通关要求"
             for(let k=0;k<GridData.levelsEnd[level].length;k++)
             {
                 let m=GridData.levelsEnd[level][k].x;
@@ -173,6 +177,7 @@ cc.Class({
             }
             display=false;
         }else{
+            this.ShowRequireButtonLabel.string="显示通关要求"
             this.updateCells();
             display=true;
         }
@@ -206,6 +211,19 @@ cc.Class({
         }
         //计算初始周围细胞数
         this.computeNumAround();
+    },
+    ShowHideNumButtonFun()
+    {
+        if(isshowNum==false)
+        {
+            this.showNum();
+            this.ShowHideButtonLabel.string="隐藏数字"
+        }
+        else
+        {
+            this.hideNum();
+            this.ShowHideButtonLabel.string="显示数字"
+        }
     },
     //显示周围细胞数目
     showNum(){
@@ -328,7 +346,7 @@ cc.Class({
     drawGrids(){
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
         let x=this.gap+this.blockSize/2;
-        let y=this.gap+this.blockSize/2;
+        let y=this.gap+this.blockSize/2+this.blockSize*4.0;
         this.positions=new Array();
         this.blocks=new Array();
         for(let i=0;i<ROWS;i++){

@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Grid_Prefab",
+    "_name": "Grid_HasNot_Prefab",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -36,9 +36,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 200,
-      "g": 114,
-      "b": 114,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_contentSize": {
@@ -55,8 +55,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        270.801,
-        508.634,
+        -96.687,
+        -16.389,
         0,
         0,
         0,
@@ -182,7 +182,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "65dOQBrdNLn5pOpOPo7A3O",
+    "fileId": "06nRR+NwpOz5HBVD1oX70e",
     "sync": false
   },
   {
@@ -201,7 +201,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "8cdb44ac-a3f6-449f-b354-7cd48cf84061"
+      "__uuid__": "398448a6-69e4-4736-8758-c10b289248e9"
     },
     "_type": 1,
     "_sizeMode": 0,
@@ -238,7 +238,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "99p9XxPaBLRZRDr/N8uv0c",
+    "fileId": "f6Q1B+mwNGsYy/n1PzOsc6",
     "sync": false
   }
 ]

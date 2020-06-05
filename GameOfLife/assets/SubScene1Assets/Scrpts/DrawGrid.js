@@ -37,9 +37,10 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        gap:5,
+        gap:0.1,
         //细胞预制件
         blockPrefab:cc.Prefab,
+        hasPrefab:cc.Prefab,
         bg:cc.Node,
         levelLabel:cc.Label,
         availableLabel:cc.Label,
@@ -126,7 +127,7 @@ cc.Class({
             }
             available--;
             this.availableLabel.string="本关还可下"+available+"个棋子，目标分布为繁衍"+stepUse+"代后的分布";
-            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+            this.changeHasCellSprite(this.touchi,this.touchj);
             ExitCell[this.touchi][this.touchj]=1;
         }
 
@@ -146,11 +147,11 @@ cc.Class({
             {
                 if(ExitCell[i][j]==1)
                 {
-                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
                 else{
-                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    this.changeHasNotCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }         
             }
@@ -187,13 +188,13 @@ cc.Class({
     loadlevel(){
         //更新当前关卡
         this.levelLabel.string="关卡："+(level+1);
-        console.log(this.levelLabel.String);
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                this.blocks[i][j].color=cc.color(200,114,114,255);
+                //this.blocks[i][j].color=cc.color(200,114,114,255);
+                this.changeHasNotCellSprite(i,j);
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
                 ExitCell[i][j]=0;             
             }
@@ -206,7 +207,8 @@ cc.Class({
             let m=GridData.levelsStart[level][k].x;
             let n=GridData.levelsStart[level][k].y;
             
-            this.blocks[m][n].color=cc.color(0,100,100,255);
+           // this.blocks[m][n].color=cc.color(0,100,100,255);
+            this.changeHasCellSprite(m,n);
             ExitCell[m][n]=1;
         }
         //计算初始周围细胞数
@@ -298,6 +300,36 @@ cc.Class({
             }
             this.updateCells();
         }
+    },
+    changeHasCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.hasPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
+    },
+    changeHasNotCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.blockPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
     },
     //生成下一代细胞
     nextGenCell(){

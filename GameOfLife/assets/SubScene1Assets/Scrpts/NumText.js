@@ -46,6 +46,22 @@ cc.Class({
         {
             this.numberLabel.node.active=true;
             this.numberLabel.string=number;
+            if(number==1)
+            {
+                this.numberLabel.node.color=cc.color(255,0,0,255);
+            }
+            if(number==2)
+            {
+                this.numberLabel.node.color=cc.color(0,255,0,255);
+            }
+            if(number==3)
+            {
+                this.numberLabel.node.color=cc.color(0,0,255,255);
+            }
+            if(number==4)
+            {
+                this.numberLabel.node.color=cc.color(255,255,0,255);
+            }
         }
             
     }

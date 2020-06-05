@@ -42,6 +42,7 @@ cc.Class({
         blockPrefab:cc.Prefab,
         bg:cc.Node,
         levelLabel:cc.Label,
+        availableLabel:cc.Label,
         canvas:cc.Node,
     },
     start () {
@@ -113,13 +114,15 @@ cc.Class({
         //可能存在错误
         this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
 
-        if(this.touchj<ROWS)
+        if(this.touchj<ROWS&&available>0)
         {          
             for(let i=0;i<ROWS;i++){
                 for(let j=0;j<COLUMNS;j++){
                     lastCells[i][j]=ExitCell[i][j];
                 }
             }
+            available--;
+            this.availableLabel.string="本关还可下"+available+"个棋子，目标分布为繁衍"+stepUse+"代后的分布";
             this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
             ExitCell[this.touchi][this.touchj]=1;
         }
@@ -190,6 +193,8 @@ cc.Class({
                 ExitCell[i][j]=0;             
             }
         }
+        this.availableLabel.string="本关还可下"+GridData.availableCell[level]+"个棋子，目标分布为繁衍"+GridData.stepUse[level]+"代后的分布";
+        available=GridData.availableCell[level];
         //载入数据
         for(let k=0;k<GridData.levelsStart[level].length;k++)
         {
@@ -301,6 +306,12 @@ cc.Class({
                 }              
             }
         }
+        if(stepUse>0)
+        {
+            stepUse--;
+            this.availableLabel.string="本关还可下"+available+"个棋子，目标分布为繁衍"+stepUse+"代后的分布";
+        }
+
         if(isshowNum==true)
         {
             this.showNum();
@@ -308,7 +319,11 @@ cc.Class({
         else{
             this.hideNum();
         }
-        this.judgeAccom();
+        if(stepUse==0)
+        {
+            this.judgeAccom();
+        }
+  
     },
     drawGrids(){
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;

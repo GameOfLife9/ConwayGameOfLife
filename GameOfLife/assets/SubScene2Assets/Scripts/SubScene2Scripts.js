@@ -65,8 +65,16 @@ cc.Class({
 
         if(this.touchj<ROWS)
         {
-            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
-            ExitCell[this.touchi][this.touchj]=1;
+            if(ExitCell[this.touchi][this.touchj]==1)
+            {
+                this.blocks[this.touchi][this.touchj].color=cc.color(200,114,114,255);
+                ExitCell[this.touchi][this.touchj]=0;
+            }
+            else{
+                this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+                ExitCell[this.touchi][this.touchj]=1;
+            }
+
         }
 
         if(isshowNum==true)

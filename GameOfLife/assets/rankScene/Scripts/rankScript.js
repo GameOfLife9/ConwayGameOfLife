@@ -45,7 +45,8 @@ cc.Class({
         this.totalInfo = [];
         let that = this;
         var str = "user=" + this.user + "&password=" + this.password;
-        var ServerLink = "http://localhost:3000/users/search";
+    //    var ServerLink = "http://localhost:3000/users/search";
+        var ServerLink = "http://30517j992t.qicp.vip/users/search"
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
@@ -73,7 +74,8 @@ cc.Class({
         //获得用户朋友信息
         let that = this;
         var str = "user=" + this.user;
-        var ServerLink = "http://localhost:3000/users/getFriends";
+    //    var ServerLink = "http://localhost:3000/users/getFriends";
+        var ServerLink = "http://30517j992t.qicp.vip/users/getFriends"
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {

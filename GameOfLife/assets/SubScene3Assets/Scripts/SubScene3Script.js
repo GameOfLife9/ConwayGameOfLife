@@ -31,6 +31,7 @@ var isStartState=false;
 var lasttime=0.0;
 var timegap=0.5;
 
+var ModelIndex=0;
 var centerx=0;
 var centery=0;
 cc.Class({
@@ -75,8 +76,15 @@ cc.Class({
 
         if(this.touchj<ROWS)
         {
-            this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
-            ExitCell[this.touchi][this.touchj]=1;
+            if(ExitCell[this.touchi][this.touchj]==1)
+            {
+                this.blocks[this.touchi][this.touchj].color=cc.color(200,114,114,255);
+                ExitCell[this.touchi][this.touchj]=0;
+            }
+            else{
+                this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+                ExitCell[this.touchi][this.touchj]=1;
+            }
         }
 
         if(isshowNum==true)
@@ -232,6 +240,7 @@ cc.Class({
     },
     loadModel(modelNum)
     {
+        ModelIndex=modelNum;
         //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
         centerx=Math.floor(ROWS/2);
         centery=Math.floor(COLUMNS/2);
@@ -309,32 +318,40 @@ cc.Class({
         }
          CellNum=TempCell;
     },
-    //返回上一代细胞
-    returnLastCell(){
-        if(this.lastCells!=null)
-        {
-            this.ExitCell=lastCells();
-            this.updateCells();
-        }
-    },
+
     //生成下一代细胞
     nextGenCell(){
-        this.lastCells=ExitCell;
+        
         this.computeNumAround();
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
+                //此处有细胞，且周围细胞数不等于可存活数目，则该细胞死亡
                 if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
                     this.blocks[i][j].color=cc.color(200,114,114,255);
                     ExitCell[i][j]=0;
+                    for(let p=0;p<ModelData.surviveNums[ModelIndex].length;p++)
+                    {
+                        if(CellNum[i][j]==ModelData.surviveNums[ModelIndex][p])
+                        {
+                            this.blocks[i][j].color=cc.color(0,100,100,255);
+                            ExitCell[i][j]=1;
+                        }
+                    }
+
                 }
     
-                //此处没有细胞，且周围细胞数为3，则生成一个细胞
-                if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                    this.blocks[i][j].color=cc.color(0,100,100,255);
-                    ExitCell[i][j]=1;
+                //此处没有细胞，且周围细胞数为等于允许出生数量，则生成一个细胞
+                if(ExitCell[i][j]==0){
+                    for(let p=0;p<ModelData.bornNums[ModelIndex].length;p++)
+                    {
+                        if(CellNum[i][j]==ModelData.bornNums[ModelIndex][p])
+                        {
+                            this.blocks[i][j].color=cc.color(0,100,100,255);
+                            ExitCell[i][j]=1;
+                        }
+                    }
                 }              
             }
         }

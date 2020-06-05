@@ -48,5 +48,9 @@ cc.Class({
     {
         cc.director.loadScene("SubScene3");       
     },
+    rankChangeButon:function()
+    {
+        cc.director.loadScene("rankScene");       
+    },
     // update (dt) {},
 });

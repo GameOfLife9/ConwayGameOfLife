@@ -9,7 +9,7 @@ cc.Class({
 
     },
     returnButtonClicked:function(){
-        cc.director.loadScene("MainScene"); 
+        cc.director.loadScene("MainScene");
     }
     // update (dt) {},
 });

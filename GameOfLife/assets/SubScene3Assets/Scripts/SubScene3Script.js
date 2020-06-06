@@ -464,6 +464,8 @@ cc.Class({
         console.log(isStartState);
     },
     returnButtonClicked:function(){
+        this.clearButton();
+        isStartState=false;
         cc.director.loadScene("MainScene"); 
     },
     //清除所有细胞

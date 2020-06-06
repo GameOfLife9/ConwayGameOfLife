@@ -43,9 +43,12 @@ cc.Class({
             type:cc.Node
         },
         blockPrefab:cc.Prefab,
+        hasPrefab:cc.Prefab,
         bg:cc.Node,
         canvas:cc.Node,
         scrollviewback:cc.Node,
+        showHideNumButton:cc.Button,
+        ShowHideButtonLabel:cc.Label,
         scrollView:{
             default:null,
             type:cc.ScrollView
@@ -72,17 +75,17 @@ cc.Class({
         this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
         
         //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
+        this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
 
-        if(this.touchj<ROWS)
+        if(this.touchj<ROWS&&this.touchj>=0)
         {
             if(ExitCell[this.touchi][this.touchj]==1)
             {
-                this.blocks[this.touchi][this.touchj].color=cc.color(200,114,114,255);
+                this.changeHasNotCellSprite(this.touchi,this.touchj);
                 ExitCell[this.touchi][this.touchj]=0;
             }
             else{
-                this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+                this.changeHasCellSprite(this.touchi,this.touchj);
                 ExitCell[this.touchi][this.touchj]=1;
             }
         }
@@ -95,6 +98,19 @@ cc.Class({
             this.hideNum();
         }
     },
+    ShowHideNumButtonFun()
+    {
+        if(isshowNum==false)
+        {
+            this.showNum();
+            this.ShowHideButtonLabel.string="隐藏数字"
+        }
+        else
+        {
+            this.hideNum();
+            this.ShowHideButtonLabel.string="显示数字"
+        }
+    },
     //根据当前的ExitCell更新blocks
     updateCells(){
         for(let i=0;i<ROWS;i++)
@@ -103,11 +119,11 @@ cc.Class({
             {
                 if(ExitCell[i][j]==1)
                 {
-                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
                 else{
-                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    this.changeHasNotCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }         
             }
@@ -169,7 +185,7 @@ cc.Class({
             this.drawGrids();
             //重新计算棋盘的中心点。
             centerx=Math.floor(ROWS/2);
-            centery=Math.floor(COLUMNS/2);
+            centery=Math.floor((COLUMNS)/2);
             for(let k=0;k<originData.length;k++)
             {
                 let m=originData[k].x+centerx;
@@ -177,7 +193,7 @@ cc.Class({
                 //TODO：为了保证数组不越界我做了限制，但实际上这存在错误，因为越界的信息丢失了
                 if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
                 {
-                    this.blocks[m][n].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(m,n);
                     ExitCell[m][n]=1;
                 }
                 else{
@@ -186,6 +202,36 @@ cc.Class({
             }
         }
 
+    },
+    changeHasCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.hasPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
+    },
+    changeHasNotCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.blockPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
     },
     //此处缩小函数的作用同放大函数
     scaleDecrease(){
@@ -224,7 +270,7 @@ cc.Class({
 
                 if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
                 {
-                    this.blocks[m][n].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(m,n);
                     ExitCell[m][n]=1;
                 }
                 else{
@@ -243,13 +289,13 @@ cc.Class({
         ModelIndex=modelNum;
         //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
         centerx=Math.floor(ROWS/2);
-        centery=Math.floor(COLUMNS/2);
+        centery=Math.floor((COLUMNS+4)/2);
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                this.blocks[i][j].color=cc.color(200,114,114,255);
+                this.changeHasNotCellSprite(i,j);
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
                 ExitCell[i][j]=0;             
             }
@@ -261,7 +307,7 @@ cc.Class({
             let n=ModelData.modelDatas[modelNum][k].y+centery;
             if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
             {
-                this.blocks[m][n].color=cc.color(0,100,100,255);
+                this.changeHasCellSprite(m,n);
                 ExitCell[m][n]=1;
             }
             else{
@@ -328,14 +374,14 @@ cc.Class({
             for(let j=0;j<COLUMNS;j++)
             {
                 //此处有细胞，且周围细胞数不等于可存活数目，则该细胞死亡
-                if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                if(ExitCell[i][j]==1){
+                    this.changeHasNotCellSprite(i,j);
                     ExitCell[i][j]=0;
                     for(let p=0;p<ModelData.surviveNums[ModelIndex].length;p++)
                     {
                         if(CellNum[i][j]==ModelData.surviveNums[ModelIndex][p])
                         {
-                            this.blocks[i][j].color=cc.color(0,100,100,255);
+                            this.changeHasCellSprite(i,j);
                             ExitCell[i][j]=1;
                         }
                     }
@@ -348,7 +394,7 @@ cc.Class({
                     {
                         if(CellNum[i][j]==ModelData.bornNums[ModelIndex][p])
                         {
-                            this.blocks[i][j].color=cc.color(0,100,100,255);
+                            this.changeHasCellSprite(i,j);
                             ExitCell[i][j]=1;
                         }
                     }
@@ -366,12 +412,12 @@ cc.Class({
     //这个函数是初始化棋盘的函数
     drawGrids(){
         //动态地设置间隔
-        this.gap=75.0/COLUMNS;
+        this.gap=30.0/COLUMNS;
 
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
         
         let x=this.gap+this.blockSize/2;
-        let y=this.gap+this.blockSize/2;
+        let y=this.gap+this.blockSize/2+this.blockSize*4.0;
         this.positions=new Array();
         this.blocks=new Array();
         for(let i=0;i<ROWS;i++){
@@ -439,10 +485,11 @@ cc.Class({
         }
 
      },
+
      //初始化载入模型列表
     initLoadList(){
         this.items=[];
-        this.spacing=20;
+        this.spacing=15;
         this.content=this.scrollView.content;
         this.itemNum=modelName.length;
         this.content.height=this.itemNum*(this.itemTemplate.height+this.spacing)+this.spacing;
@@ -452,7 +499,7 @@ cc.Class({
             item.getComponent('ItemButton').setNumAndName(k,ModelData.modelName[k]);
             
             this.content.addChild(item);
-            item.setPosition(0,-item.height*(k+0.5)-this.spacing*(k+1));
+            item.setPosition(0,-item.height*(k+0.5)-this.spacing*(k+1)-30.0);
             this.items.push(item);
         }
     },

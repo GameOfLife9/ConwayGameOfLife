@@ -36,8 +36,10 @@ cc.Class({
     properties: {
         
         blockPrefab:cc.Prefab,
+        hasPrefab:cc.Prefab,
         bg:cc.Node,
         canvas:cc.Node,
+        ShowHideButtonLabel:cc.Label,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -61,17 +63,17 @@ cc.Class({
         this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
         
         //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap)/(this.blockSize+this.gap));
+        this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
 
-        if(this.touchj<ROWS)
+        if(this.touchj<ROWS&&this.touchj>=0)
         {
             if(ExitCell[this.touchi][this.touchj]==1)
             {
-                this.blocks[this.touchi][this.touchj].color=cc.color(200,114,114,255);
+                this.changeHasNotCellSprite(this.touchi,this.touchj);
                 ExitCell[this.touchi][this.touchj]=0;
             }
             else{
-                this.blocks[this.touchi][this.touchj].color=cc.color(0,100,100,255);
+                this.changeHasCellSprite(this.touchi,this.touchj);
                 ExitCell[this.touchi][this.touchj]=1;
             }
         }
@@ -84,6 +86,36 @@ cc.Class({
             this.hideNum();
         }
     },
+    changeHasCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.hasPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
+    },
+    changeHasNotCellSprite(i,j){
+        let x=this.positions[i][j].x;
+        let y=this.positions[i][j].y;
+
+        let block=cc.instantiate(this.blockPrefab);
+        block.width=this.blockSize;
+        block.height=this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x,y));
+
+        this.positions[i][j]=cc.v2(x,y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j]=block;
+    },
     //根据当前的ExitCell更新blocks
     updateCells(){
         for(let i=0;i<ROWS;i++)
@@ -92,11 +124,11 @@ cc.Class({
             {
                 if(ExitCell[i][j]==1)
                 {
-                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
                 else{
-                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    this.changeHasNotCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }         
             }
@@ -177,13 +209,13 @@ cc.Class({
            {
                //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
                if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                   this.blocks[i][j].color=cc.color(200,114,114,255);
+                this.changeHasNotCellSprite(i,j);
                    ExitCell[i][j]=0;
                }
    
                //此处没有细胞，且周围细胞数为3，则生成一个细胞
                if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                   this.blocks[i][j].color=cc.color(0,100,100,255);
+                this.changeHasCellSprite(i,j);
                    ExitCell[i][j]=1;
                }              
            }
@@ -196,13 +228,26 @@ cc.Class({
            this.hideNum();
        }
    },
+   ShowHideNumButtonFun()
+   {
+       if(isshowNum==false)
+       {
+           this.showNum();
+           this.ShowHideButtonLabel.string="隐藏数字"
+       }
+       else
+       {
+           this.hideNum();
+           this.ShowHideButtonLabel.string="显示数字"
+       }
+   },
     drawGrids(){
         this.gap=75.0/COLUMNS;
 
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
         
         let x=this.gap+this.blockSize/2;
-        let y=this.gap+this.blockSize/2;
+        let y=this.gap+this.blockSize/2+this.blockSize*4.0;
         this.positions=new Array();
         this.blocks=new Array();
         for(let i=0;i<ROWS;i++){

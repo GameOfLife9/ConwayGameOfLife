@@ -329,7 +329,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "e2e87b53-934c-497c-bc27-c0368a65664c"
+      "__uuid__": "d7f2e380-859b-4ee5-8f8f-379f577f5108"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -2689,9 +2689,7 @@
       "__id__": 2
     },
     "_enabled": true,
-    "blockPrefab": {
-      "__uuid__": "b233a268-234a-42c0-909f-4a2e5c2032f7"
-    },
+    "blockPrefab": null,
     "bg": {
       "__id__": 5
     },

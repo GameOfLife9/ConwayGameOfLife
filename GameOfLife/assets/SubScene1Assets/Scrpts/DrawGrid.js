@@ -43,7 +43,6 @@ cc.Class({
         hasPrefab:cc.Prefab,
         bg:cc.Node,
         levelLabel:cc.Label,
-        availableLabel:cc.Label,
         canvas:cc.Node,
         showHideNumButton:cc.Button,
         ShowHideButtonLabel:cc.Label,
@@ -126,7 +125,7 @@ cc.Class({
                 }
             }
             available--;
-            this.availableLabel.string="本关还可下"+available+"个棋子，目标分布为繁衍"+stepUse+"代后的分布";
+            this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
             this.changeHasCellSprite(this.touchi,this.touchj);
             ExitCell[this.touchi][this.touchj]=1;
         }
@@ -187,7 +186,7 @@ cc.Class({
     //载入关卡
     loadlevel(){
         //更新当前关卡
-        this.levelLabel.string="关卡："+(level+1);
+        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
@@ -199,7 +198,7 @@ cc.Class({
                 ExitCell[i][j]=0;             
             }
         }
-        this.availableLabel.string="本关还可下"+GridData.availableCell[level]+"个棋子，目标分布为繁衍"+GridData.stepUse[level]+"代后的分布";
+        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         available=GridData.availableCell[level];
         //载入数据
         for(let k=0;k<GridData.levelsStart[level].length;k++)
@@ -359,7 +358,7 @@ cc.Class({
         if(stepUse>0)
         {
             stepUse--;
-            this.availableLabel.string="本关还可下"+available+"个棋子，目标分布为繁衍"+stepUse+"代后的分布";
+            this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         }
 
         if(isshowNum==true)

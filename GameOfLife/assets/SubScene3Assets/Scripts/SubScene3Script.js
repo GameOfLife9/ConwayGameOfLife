@@ -316,6 +316,9 @@ cc.Class({
             }
  
         }
+
+
+        this.hideNum();
         //计算初始周围细胞数
         this.computeNumAround();
     },
@@ -371,9 +374,9 @@ cc.Class({
     nextGenCell(){
         
         this.computeNumAround();
-        for(let i=0;i<originRow;i++)
+        for(let i=0;i<ROWS;i++)
         {
-            for(let j=0;j<originRow;j++)
+            for(let j=0;j<COLUMNS;j++)
             {
                 //此处有细胞，且周围细胞数不等于可存活数目，则该细胞死亡
                 if(ExitCell[i][j]==1){
@@ -389,18 +392,7 @@ cc.Class({
                     }
 
                 }
-                if(originCell[i][j]==1){
-                    originCell[i][j]=0;
-                    for(let p=0;p<ModelData.surviveNums[ModelIndex].length;p++)
-                    {
-                        if(originCell[i][j]==ModelData.surviveNums[ModelIndex][p])
-                        {
-                            this.changeHasCellSprite(i,j);
-                            ExitCell[i][j]=1;
-                        }
-                    }
-
-                }
+    
                 //此处没有细胞，且周围细胞数为等于允许出生数量，则生成一个细胞
                 if(ExitCell[i][j]==0){
                     for(let p=0;p<ModelData.bornNums[ModelIndex].length;p++)

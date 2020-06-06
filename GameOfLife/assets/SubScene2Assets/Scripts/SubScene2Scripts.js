@@ -1,6 +1,6 @@
 const ROWS=15;
 const COLUMNS=15;
-var isshowNum=true;
+var isshowNum=false;
 //当前关卡级数，用于loadLevel
 
 
@@ -280,7 +280,7 @@ cc.Class({
             y+=this.gap+this.blockSize;
             x=this.gap+this.blockSize/2;
         }
-        this.showNum();
+        this.hideNum();
     },
     startEndButtonClicked(){
         isStartState=!isStartState;

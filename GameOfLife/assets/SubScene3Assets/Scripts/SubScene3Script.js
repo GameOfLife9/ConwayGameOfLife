@@ -3,7 +3,7 @@ import * as ModelData from 'ModelData';
 import { modelName } from './ModelData';
 var ROWS=15;
 var COLUMNS=15;
-var isshowNum=true;
+var isshowNum=false;
 //当前关卡级数，用于loadLevel
 
 //暂时变量，之后删掉
@@ -450,7 +450,7 @@ cc.Class({
             y+=this.gap+this.blockSize;
             x=this.gap+this.blockSize/2;
         }
-        this.showNum();
+        this.hideNum();
     },
     //切换状态，=true时细胞自动繁殖至下一代，=false时停止
     startEndButtonClicked(){

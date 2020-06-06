@@ -1,7 +1,7 @@
 import * as GridData from 'GridData';
 const ROWS=15;
 const COLUMNS=15;
-var isshowNum=true;
+var isshowNum=false;
 //当前关卡级数，用于loadLevel
 var level=0;
 
@@ -117,7 +117,7 @@ cc.Class({
         //可能存在错误
         this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
 
-        if(this.touchj<ROWS&&available>0)
+        if(this.touchj<ROWS&&available>0&&this.touchj>=0)
         {          
             for(let i=0;i<ROWS;i++){
                 for(let j=0;j<COLUMNS;j++){
@@ -186,7 +186,6 @@ cc.Class({
     //载入关卡
     loadlevel(){
         //更新当前关卡
-        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
@@ -198,8 +197,10 @@ cc.Class({
                 ExitCell[i][j]=0;             
             }
         }
-        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
+        
         available=GridData.availableCell[level];
+        stepUse=GridData.stepUse[level];
+        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         //载入数据
         for(let k=0;k<GridData.levelsStart[level].length;k++)
         {
@@ -408,7 +409,7 @@ cc.Class({
         }
 
         this.loadlevel();
-        this.showNum();
+        this.hideNum();
     },
     /*
      update (dt) {

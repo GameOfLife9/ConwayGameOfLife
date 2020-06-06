@@ -40,10 +40,6 @@ cc.Class({
     {
         cc.director.loadScene("SubScene1");       
     },
-    Scene2ChangeButon:function()
-    {
-        cc.director.loadScene("SubScene2");       
-    },
     Scene3ChangeButon:function()
     {
         cc.director.loadScene("SubScene3");       

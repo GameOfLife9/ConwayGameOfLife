@@ -1,8 +1,8 @@
 //ModelData存储模型坐标信息
 import * as ModelData from 'ModelData';
 import { modelName } from './ModelData';
-var ROWS=15;
-var COLUMNS=15;
+var ROWS=25;
+var COLUMNS=25;
 var isshowNum=false;
 //当前关卡级数，用于loadLevel
 
@@ -75,8 +75,8 @@ cc.Class({
         this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
         
         //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
-
+        //this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
+        this.touchj=Math.floor((touchLoc.y-cc.winSize.height*0.15+this.blockSize/2.0)/(this.blockSize+this.gap));
         if(this.touchj<ROWS&&this.touchj>=0)
         {
             if(ExitCell[this.touchi][this.touchj]==1)
@@ -289,7 +289,7 @@ cc.Class({
         ModelIndex=modelNum;
         //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
         centerx=Math.floor(ROWS/2);
-        centery=Math.floor((COLUMNS+4)/2);
+        centery=Math.floor((COLUMNS)/2);
         //首先清零
         for(let i=0;i<ROWS;i++)
         {
@@ -305,6 +305,7 @@ cc.Class({
         {
             let m=ModelData.modelDatas[modelNum][k].x+centerx;
             let n=ModelData.modelDatas[modelNum][k].y+centery;
+ 
             if(m>=0&&m<COLUMNS&&n>=0&&n<ROWS)
             {
                 this.changeHasCellSprite(m,n);
@@ -313,6 +314,7 @@ cc.Class({
             else{
                 console.log("Function Loadmodel out index");
             }
+ 
         }
         //计算初始周围细胞数
         this.computeNumAround();
@@ -369,9 +371,9 @@ cc.Class({
     nextGenCell(){
         
         this.computeNumAround();
-        for(let i=0;i<ROWS;i++)
+        for(let i=0;i<originRow;i++)
         {
-            for(let j=0;j<COLUMNS;j++)
+            for(let j=0;j<originRow;j++)
             {
                 //此处有细胞，且周围细胞数不等于可存活数目，则该细胞死亡
                 if(ExitCell[i][j]==1){
@@ -387,7 +389,18 @@ cc.Class({
                     }
 
                 }
-    
+                if(originCell[i][j]==1){
+                    originCell[i][j]=0;
+                    for(let p=0;p<ModelData.surviveNums[ModelIndex].length;p++)
+                    {
+                        if(originCell[i][j]==ModelData.surviveNums[ModelIndex][p])
+                        {
+                            this.changeHasCellSprite(i,j);
+                            ExitCell[i][j]=1;
+                        }
+                    }
+
+                }
                 //此处没有细胞，且周围细胞数为等于允许出生数量，则生成一个细胞
                 if(ExitCell[i][j]==0){
                     for(let p=0;p<ModelData.bornNums[ModelIndex].length;p++)
@@ -417,7 +430,8 @@ cc.Class({
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
         
         let x=this.gap+this.blockSize/2;
-        let y=this.gap+this.blockSize/2+this.blockSize*4.0;
+        //let y=this.gap+this.blockSize/2+this.blockSize*4.0;
+        let y=cc.winSize.height*0.15;
         this.positions=new Array();
         this.blocks=new Array();
         for(let i=0;i<ROWS;i++){

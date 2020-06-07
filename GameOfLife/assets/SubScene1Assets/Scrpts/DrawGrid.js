@@ -4,7 +4,9 @@ const COLUMNS=15;
 var isshowNum=false;
 //当前关卡级数，用于loadLevel
 var level=0;
-
+//记录时间
+var time=0.0;
+var maxlevel=0;
 var stepUse=1;
 var available=1;
 //暂时变量，之后删掉
@@ -47,10 +49,22 @@ cc.Class({
         showHideNumButton:cc.Button,
         ShowHideButtonLabel:cc.Label,
         ShowRequireButtonLabel:cc.Label,
+        SucessSprite:cc.Sprite,
+        SucessBackButton:cc.Button,
+        itemTemplate:{
+            default:null,
+            type:cc.Node
+        },
+        scrollView:{
+            default:null,
+            type:cc.ScrollView
+        },
+        scrollViewBack:cc.Button,
     },
     start () {
         this.drawGrids();
 
+        this.initLoadList();
          //获取触碰到的方块的索引i j
         var self = this;
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
@@ -59,7 +73,7 @@ cc.Class({
     },
     //判断是否通关
     judgeAccom(){
-        let isAccmp=true;
+        this.isAccmp=true;
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
@@ -71,7 +85,7 @@ cc.Class({
                         let m=GridData.levelsEnd[level][k].x;
                         let n=GridData.levelsEnd[level][k].y;
                         if(m==i&&n==j){
-                            isAccmp=false;
+                            this.isAccmp=false;
                         }
                     }
                 }
@@ -87,24 +101,55 @@ cc.Class({
                         }
                     }
                     if(hasfind==false){
-                        isAccmp=false;
+                        this.isAccmp=false;
                     }
                 }
             }
         }
         //如果通关，执行通关操作
-        console.log("通关？",isAccmp);
-        if(isAccmp==true){
-            this.accomplish();
+        console.log("通关？",this.isAccmp);
+        if(this.isAccmp==true)
+        {
+            level++;
+            if(level>maxlevel)
+            {
+                maxlevel=level;
+            }
+            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="恭喜通关";
+            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="下一关"
         }
+        else{
+           this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="失败";
+           this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="重来"
+        }
+        this.accomplish();
     },
-    //通关操作，载入下一关
     accomplish(){
-        level++;
-        if(level<GridData.levelsEnd.length){
-            console.log("loadlevel");
-            this.loadlevel();
-        }          
+
+        this.SucessSprite.node.active=true;
+        this.SucessBackButton.node.active=true;
+  
+    },
+    nextLevelClicked()
+    {
+        if(this.isAccmp==true)
+        {
+            
+            this.SucessSprite.node.active=false;
+            this.SucessBackButton.node.active=false; 
+            if(level<GridData.levelsEnd.length){
+                this.loadlevel();  
+                time=0.0;   
+            }  
+        }
+        else
+        {
+
+            this.SucessSprite.node.active=false;
+            this.SucessBackButton.node.active=false; 
+            this.resStart();
+        }
+
     },
     //触摸事件
     touchedEvent(event){
@@ -213,6 +258,7 @@ cc.Class({
         }
         //计算初始周围细胞数
         this.computeNumAround();
+        this.hideNum();
     },
     ShowHideNumButtonFun()
     {
@@ -291,6 +337,8 @@ cc.Class({
     },
     //返回上一代细胞
     returnLastCell(){
+        available++;
+        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         if(lastCells!=null)
         {
             for(let i=0;i<ROWS;i++){
@@ -300,6 +348,7 @@ cc.Class({
             }
             this.updateCells();
         }
+
     },
     changeHasCellSprite(i,j){
         let x=this.positions[i][j].x;
@@ -345,13 +394,13 @@ cc.Class({
             {
                 //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
                 if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                    this.blocks[i][j].color=cc.color(200,114,114,255);
+                    this.changeHasNotCellSprite(i,j);
                     ExitCell[i][j]=0;
                 }
 
                 //此处没有细胞，且周围细胞数为3，则生成一个细胞
                 if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                    this.blocks[i][j].color=cc.color(0,100,100,255);
+                    this.changeHasCellSprite(i,j);
                     ExitCell[i][j]=1;
                 }              
             }
@@ -371,7 +420,15 @@ cc.Class({
         }
         if(stepUse==0)
         {
-            this.judgeAccom();
+            if(available>0)
+            {
+                available--;
+            }
+            else
+            {
+                this.judgeAccom();
+            }
+
         }
   
     },
@@ -411,8 +468,48 @@ cc.Class({
         this.loadlevel();
         this.hideNum();
     },
-    /*
+    selectLevel(i)
+    {
+        level=i;
+        this.loadlevel();
+    },
+     //初始化载入模型列表
+     initLoadList(){
+        this.items=[];
+        this.spacing=15;
+        this.content=this.scrollView.content;
+        this.itemNum=GridData.levelsStart.length;
+        this.content.height=this.itemNum*(this.itemTemplate.height+this.spacing)+this.spacing;
+        for(let k=0;k<this.itemNum;k++){
+            let item=cc.instantiate(this.itemTemplate);
+            item.getComponent('LevelButton').setNumAndName(k);
+            this.content.addChild(item);
+            item.setPosition(0,-item.height*(k+0.5)-this.spacing*(k+1)-30.0);
+            this.items.push(item);
+        }
+    },
+    showScorollView(){
+        this.scrollView.node.active=true;
+        this.scrollViewBack.node.active=true;
+        for(let i=0;i<this.itemNum;i++)
+        {
+            if(i<maxlevel+1)
+            {
+                this.items[i].getComponent(cc.Button).interactable = true;
+            }
+            else
+            {
+                this.items[i].getComponent(cc.Button).interactable = false;
+            }
+
+        }
+    },
+    //隐藏载入模型列表
+    disableScorollView(){
+        this.scrollView.node.active=false;
+        this.scrollViewBack.node.active=false;
+    },
      update (dt) {
-         
-     },*/
+         time+=dt;
+     },
 });

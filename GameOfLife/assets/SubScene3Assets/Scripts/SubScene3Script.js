@@ -394,7 +394,7 @@ cc.Class({
                 }
     
                 //此处没有细胞，且周围细胞数为等于允许出生数量，则生成一个细胞
-                if(ExitCell[i][j]==0){
+                else{
                     for(let p=0;p<ModelData.bornNums[ModelIndex].length;p++)
                     {
                         if(CellNum[i][j]==ModelData.bornNums[ModelIndex][p])

@@ -34,7 +34,7 @@ cc.Class({
     // onLoad () {},
 
     start () {
-
+        
     },
     Scene1ChangeButon:function()
     {

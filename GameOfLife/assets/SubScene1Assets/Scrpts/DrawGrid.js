@@ -61,15 +61,21 @@ cc.Class({
         },
         scrollViewBack:cc.Button,
     },
+    onLoad() {
+        var node = cc.director.getScene().getChildByName('userInfo');
+        var data = node.getComponent('userInfo').getdata();
+        this.user = data.user;
+        this.password = data.password;
+        this.getUsersInfo();
+    },
     start () {
         this.drawGrids();
-
         this.initLoadList();
          //获取触碰到的方块的索引i j
         var self = this;
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
-           this.touchedEvent(event);
-           }, self);
+            this.touchedEvent(event);
+        }, self);
     },
     //判断是否通关
     judgeAccom(){
@@ -114,13 +120,14 @@ cc.Class({
             if(level>maxlevel)
             {
                 maxlevel=level;
+                this.updateUserRank();
             }
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="下一关"
         }
         else{
-           this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="失败";
-           this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="重来"
+            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="失败";
+            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="重来"
         }
         this.accomplish();
     },
@@ -128,25 +135,25 @@ cc.Class({
 
         this.SucessSprite.node.active=true;
         this.SucessBackButton.node.active=true;
-  
+
     },
     nextLevelClicked()
     {
         if(this.isAccmp==true)
         {
-            
+
             this.SucessSprite.node.active=false;
-            this.SucessBackButton.node.active=false; 
+            this.SucessBackButton.node.active=false;
             if(level<GridData.levelsEnd.length){
-                this.loadlevel();  
-                time=0.0;   
-            }  
+                this.loadlevel();
+                time=0.0;
+            }
         }
         else
         {
 
             this.SucessSprite.node.active=false;
-            this.SucessBackButton.node.active=false; 
+            this.SucessBackButton.node.active=false;
             this.resStart();
         }
 
@@ -157,13 +164,13 @@ cc.Class({
         var touchLoc = touches[0].getLocation();
 
         //获取触碰到的方块 i j
-        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));   
-        
+        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));
+
         //可能存在错误
         this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
 
         if(this.touchj<ROWS&&available>0&&this.touchj>=0)
-        {          
+        {
             for(let i=0;i<ROWS;i++){
                 for(let j=0;j<COLUMNS;j++){
                     lastCells[i][j]=ExitCell[i][j];
@@ -197,7 +204,7 @@ cc.Class({
                 else{
                     this.changeHasNotCellSprite(i,j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
-                }         
+                }
             }
         }
         if(isshowNum==true)
@@ -210,14 +217,14 @@ cc.Class({
         }
     },
     //显示或者隐藏通关要求
-    displayOrHideReq(){    
+    displayOrHideReq(){
         if(display){
             this.ShowRequireButtonLabel.string="隐藏通关要求"
             for(let k=0;k<GridData.levelsEnd[level].length;k++)
             {
                 let m=GridData.levelsEnd[level][k].x;
                 let n=GridData.levelsEnd[level][k].y;
-                
+
                 this.blocks[m][n].color=cc.color(50,10,150,255);
             }
             display=false;
@@ -239,10 +246,10 @@ cc.Class({
                 //this.blocks[i][j].color=cc.color(200,114,114,255);
                 this.changeHasNotCellSprite(i,j);
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
-                ExitCell[i][j]=0;             
+                ExitCell[i][j]=0;
             }
         }
-        
+
         available=GridData.availableCell[level];
         stepUse=GridData.stepUse[level];
         this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
@@ -251,7 +258,7 @@ cc.Class({
         {
             let m=GridData.levelsStart[level][k].x;
             let n=GridData.levelsStart[level][k].y;
-            
+
            // this.blocks[m][n].color=cc.color(0,100,100,255);
             this.changeHasCellSprite(m,n);
             ExitCell[m][n]=1;
@@ -308,14 +315,14 @@ cc.Class({
         for(let i=0;i<ROWS;i++){
             TempCell[i]=new Array();
             for(let j=0;j<COLUMNS;j++){
-             TempCell[i][j]=0;
+                TempCell[i][j]=0;
             }
         }
         for(let i=0;i<ROWS;i++)
         {
             for(let j=0;j<COLUMNS;j++)
             {
-                 let aroundNum=0;
+                let aroundNum=0;
                 for(let k=-1;k<=1;k++)
                 {
                     for(let l=-1;l<=1;l++)
@@ -325,9 +332,9 @@ cc.Class({
                             (i+k)>=0&&(i+k)<ROWS&&
                             (j+l)>=0&&(j+l)<COLUMNS&&
                             (ExitCell[i+k][j+l]!=0))
-                         {
+                        {
                                 aroundNum++;
-                         }
+                        }
                     }
                 }
                 TempCell[i][j]=aroundNum;
@@ -402,7 +409,7 @@ cc.Class({
                 if(ExitCell[i][j]==0&&CellNum[i][j]==3){
                     this.changeHasCellSprite(i,j);
                     ExitCell[i][j]=1;
-                }              
+                }
             }
         }
         if(stepUse>0)
@@ -430,7 +437,7 @@ cc.Class({
             }
 
         }
-  
+
     },
     drawGrids(){
         this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
@@ -474,7 +481,7 @@ cc.Class({
         this.loadlevel();
     },
      //初始化载入模型列表
-     initLoadList(){
+    initLoadList(){
         this.items=[];
         this.spacing=15;
         this.content=this.scrollView.content;
@@ -509,7 +516,40 @@ cc.Class({
         this.scrollView.node.active=false;
         this.scrollViewBack.node.active=false;
     },
-     update (dt) {
-         time+=dt;
-     },
+    getUsersInfo: function () {
+        //获得用户信息
+        let that = this;
+        var str = "user=" + this.user + "&password=" + this.password;
+        //    var ServerLink = "http://localhost:3000/users/search";
+        var ServerLink = "http://30517j992t.qicp.vip/users/search"
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
+                console.log("连接成功");
+                var response = xhr.responseText;
+                var obj2 = eval("(" + response + ")");
+                maxlevel = obj2.rank;
+            }
+        };
+        xhr.open("POST", ServerLink, false);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+        xhr.send(str);
+    },
+    updateUserRank: function () {
+        let that = this;
+        var str = "user=" + this.user + "&rank=" + maxlevel;
+        //    var ServerLink = "http://localhost:3000/users/search";
+        var ServerLink = "http://30517j992t.qicp.vip/users/updataUserRank"
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
+            }
+        };
+        xhr.open("POST", ServerLink,false);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+        xhr.send(str);
+    },
+    update (dt) {
+        time+=dt;
+    },
 });

@@ -6,12 +6,12 @@ cc.Class({
         SUM: 100,
         PAGE_NUM: 8,
         arr: [],
-        user:"admin",
-        password:"123456",
+        user: "admin",
+        password: "123456",
         MyNameLabel: cc.Label,
         MyRankLabel: cc.Label,
         MyPlace: cc.Label,
-        MyHead:cc.Node,
+        MyHead: cc.Node,
         infoLabel: {
             type: cc.Prefab,
             default: null,
@@ -45,7 +45,7 @@ cc.Class({
         this.totalInfo = [];
         let that = this;
         var str = "user=" + this.user + "&password=" + this.password;
-    //    var ServerLink = "http://localhost:3000/users/search";
+        //    var ServerLink = "http://localhost:3000/users/search";
         var ServerLink = "http://30517j992t.qicp.vip/users/search"
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -55,7 +55,7 @@ cc.Class({
                 var obj = {};
                 var obj2 = eval("(" + response + ")");
                 var url = obj2.head;
-                that.loadImgByUrl(that.MyHead,url,"jpg")
+                that.loadImgByUrl(that.MyHead, url, "jpg")
                 obj.name = that.user;
                 obj.rank = 1;
                 obj.gq = obj2.rank;
@@ -74,7 +74,7 @@ cc.Class({
         //获得用户朋友信息
         let that = this;
         var str = "user=" + this.user;
-    //    var ServerLink = "http://localhost:3000/users/getFriends";
+        //    var ServerLink = "http://localhost:3000/users/getFriends";
         var ServerLink = "http://30517j992t.qicp.vip/users/getFriends"
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -104,6 +104,10 @@ cc.Class({
         xhr.send(str);
     },
     onLoad() {
+        var node = cc.director.getScene().getChildByName('userInfo');
+        var data = node.getComponent('userInfo').getdata();
+        this.user = data.user;
+        this.password = data.password;
         this.getUsersInfo();
         this.getfriend();
         this.prepareTo();
@@ -137,8 +141,8 @@ cc.Class({
             var theRank = this.opt_item_set[i].getChildByName("rank").getComponent(cc.Label);
             var node = this.opt_item_set[i].getChildByName("picture");
             var theHead = node.getChildByName("head").getComponent(cc.Sprite);
-            var url =this.arr[this.start_index + i].friend_head;
-            this.loadImgByUrl(theHead,url,"jpg");
+            var url = this.arr[this.start_index + i].friend_head;
+            this.loadImgByUrl(theHead, url, "jpg");
             user_name.string = this.arr[this.start_index + i].friend_id;
             theRank.string = this.arr[this.start_index + i].friend_rank;
             label.string = this.value_set[this.start_index + i];
@@ -199,7 +203,7 @@ cc.Class({
         imgNode.getComponent(cc.Sprite).spriteFrame = spriteFrame;
     },
     loadImgByUrl: function (imgNode, remoteUrl, imageType) {
-        let that=this;
+        let that = this;
         if (!imageType) {
             imageType = "png";
         }

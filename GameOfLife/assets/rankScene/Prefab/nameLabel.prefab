@@ -66,7 +66,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        423.551,
+        -255.2,
         -8,
         0,
         0,
@@ -193,7 +193,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "df/GiZ+L5HyL3IehMxlaL6",
     "sync": false
@@ -368,7 +368,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "757Ee6TmJEoKw9nQ/1i/TP",
     "sync": false
@@ -399,7 +399,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "34mxVL8NZH15WcwN0E1uir",
     "sync": false
@@ -504,7 +504,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "66Rrs7Q9dHgJFiT+t/0yH5",
     "sync": false
@@ -609,7 +609,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "0abkh6dZdN9LBWhjOOynZH",
     "sync": false
@@ -782,7 +782,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "afcCloj5JJ0aGeXBsf/+vl",
     "sync": false
@@ -813,7 +813,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "d8xh0QhuJIO53w8/Ge55pz",
     "sync": false
@@ -918,7 +918,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "87S5iLjcJE0blcdyzaLboY",
     "sync": false
@@ -1023,7 +1023,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "83YpFlEpBDIKCgr8ajtj4y",
     "sync": false
@@ -1034,7 +1034,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "24feb301-58ac-4d12-8026-907493a9e9d8"
     },
     "fileId": "d7zOqqsX5NLbm52eNO2w3D",
     "sync": false

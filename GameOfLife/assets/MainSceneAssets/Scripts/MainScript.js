@@ -6,7 +6,7 @@ cc.Class({
     },
     start () {
         //获取常驻节点所绑定的脚本
-        var userInfo = cc.find('userInfo').getComponent('userInfo');
+        var userInfo = cc.find("InfoNode").getComponent('userInfo');
         //调用该脚本的函数并传值
         var info={};
         info.user = this.user;

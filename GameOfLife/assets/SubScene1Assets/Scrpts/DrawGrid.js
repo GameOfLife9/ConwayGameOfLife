@@ -62,11 +62,12 @@ cc.Class({
         scrollViewBack:cc.Button,
     },
     onLoad() {
-        var node = cc.director.getScene().getChildByName('userInfo');
+        //var node = cc.director.getScene().getChildByName('InforNode');
+        var node=cc.find("InfoNode");
         var data = node.getComponent('userInfo').getdata();
         this.user = data.user;
         this.password = data.password;
-        this.getUsersInfo();
+       // this.getUsersInfo();
     },
     start () {
         this.drawGrids();
@@ -120,7 +121,7 @@ cc.Class({
             if(level>maxlevel)
             {
                 maxlevel=level;
-                this.updateUserRank();
+                //this.updateUserRank();
             }
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="下一关"
@@ -344,7 +345,18 @@ cc.Class({
     },
     //返回上一代细胞
     returnLastCell(){
-        available++;
+        let changed=false;
+        for(let i=0;i<ROWS;i++){
+            for(let j=0;j<COLUMNS;j++){
+                if(ExitCell[i][j]!=lastCells[i][j])
+                changed=true;
+            }
+        }
+        if(changed)
+        {
+            available++;
+        }
+
         this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
         if(lastCells!=null)
         {

@@ -219,7 +219,7 @@
       "array": [
         0,
         0,
-        350.1990226553324,
+        275.2087512843091,
         0,
         0,
         0,
@@ -2795,8 +2795,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "上一代细胞",
-    "_N$string": "上一代细胞",
+    "_string": "上一步",
+    "_N$string": "上一步",
     "_fontSize": 20,
     "_lineHeight": 40,
     "_enableWrapText": false,

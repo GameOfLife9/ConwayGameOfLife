@@ -29,7 +29,7 @@ cc.Class({
         }
     },
     start() {
-        this.getInfo();
+        //this.getInfo();
         //获取常驻节点所绑定的脚本
         var userInfo = cc.find('userInfo').getComponent('userInfo');
         //调用该脚本的函数并传值

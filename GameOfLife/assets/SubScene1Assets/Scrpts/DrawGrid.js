@@ -1,520 +1,521 @@
 import * as GridData from 'GridData';
-const ROWS=15;
-const COLUMNS=15;
-var isshowNum=false;
+const ROWS = 15;
+const COLUMNS = 15;
+var isshowNum = false;
 //当前关卡级数，用于loadLevel
-var level=0;
+var level = 0;
 //记录时间
-var time=0.0;
-var maxlevel=0;
-var stepUse=1;
-var available=1;
+var time = 0.0;
+var maxlevel = 0;
+var stepUse = 1;
+var available = 1;
 //暂时变量，之后删掉
-var display=true;
+var display = true;
 //exitcell用于判断格子i j是否有细胞
 //blocks用于存储细胞实体
-var ExitCell=new Array();
-for(let i=0;i<ROWS;i++){
-    ExitCell[i]=new Array();
-    for(let j=0;j<COLUMNS;j++){
-        ExitCell[i][j]=0;
+var ExitCell = new Array();
+for (let i = 0; i < ROWS; i++) {
+    ExitCell[i] = new Array();
+    for (let j = 0; j < COLUMNS; j++) {
+        ExitCell[i][j] = 0;
     }
 }
-var lastCells=new Array();
-for(let i=0;i<ROWS;i++){
-    lastCells[i]=new Array();
-    for(let j=0;j<COLUMNS;j++){
-        lastCells[i][j]=0;
+var lastCells = new Array();
+for (let i = 0; i < ROWS; i++) {
+    lastCells[i] = new Array();
+    for (let j = 0; j < COLUMNS; j++) {
+        lastCells[i][j] = 0;
     }
 }
 //cellNum实时存储细胞ij周围细胞数目
-var CellNum=new Array();
-for(let i=0;i<ROWS;i++){
-    CellNum[i]=new Array();
-    for(let j=0;j<COLUMNS;j++){
-        CellNum[i][j]=0;
+var CellNum = new Array();
+for (let i = 0; i < ROWS; i++) {
+    CellNum[i] = new Array();
+    for (let j = 0; j < COLUMNS; j++) {
+        CellNum[i][j] = 0;
     }
 }
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        gap:0.1,
+        gap: 0.1,
         //细胞预制件
-        blockPrefab:cc.Prefab,
-        hasPrefab:cc.Prefab,
-        bg:cc.Node,
-        levelLabel:cc.Label,
-        canvas:cc.Node,
-        showHideNumButton:cc.Button,
-        ShowHideButtonLabel:cc.Label,
-        ShowRequireButtonLabel:cc.Label,
-        SucessSprite:cc.Sprite,
-        SucessBackButton:cc.Button,
-        itemTemplate:{
-            default:null,
-            type:cc.Node
+        blockPrefab: cc.Prefab,
+        hasPrefab: cc.Prefab,
+        bg: cc.Node,
+        levelLabel: cc.Label,
+        canvas: cc.Node,
+        showHideNumButton: cc.Button,
+        ShowHideButtonLabel: cc.Label,
+        ShowRequireButtonLabel: cc.Label,
+        SucessSprite: cc.Sprite,
+        SucessBackButton: cc.Button,
+        itemTemplate: {
+            default: null,
+            type: cc.Node
         },
-        scrollView:{
-            default:null,
-            type:cc.ScrollView
+        scrollView: {
+            default: null,
+            type: cc.ScrollView
         },
-        scrollViewBack:cc.Button,
+        scrollViewBack: cc.Button,
+    },
+    changeSize(node, size, x, y) {
+        node.width = size;
+        node.height = size;
+        node.x = x;
+        node.y = y;
+    },
+    cCzie(){
+        let windowSize = cc.view.getVisibleSize();
+        let tWidth = windowSize.width;
+        let tHeight = windowSize.height;
+        let tx = -tWidth / 2;
+        let ty = -tHeight / 2;
+        let btnSize = tWidth / 9;
+        let dx = (tWidth - 4 * btnSize) / 5;
+        let btsY = tHeight * 0.025;
+
+        let tnode = this.node.getChildByName("LastCell_Button");
+        tx = dx + tx + btnSize / 2;
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
+
+        tnode = this.node.getChildByName("NextGen_Butoon");
+        tx = tx + dx + btnSize;
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
+
+        tnode = this.node.getChildByName("ShowNum_Button");
+        tx = tx + dx + btnSize;
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
+
+        tnode = this.node.getChildByName("ShowReq_Button");
+        tx = tx + dx + btnSize;
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
+
+        tx = -tWidth / 2;
+        tnode = this.node.getChildByName("Return_Button");
+        tx = dx + tx + btnSize / 2;
+        this.changeSize(tnode, btnSize, tx-5, -ty - btsY - btnSize / 2);
+
+        tnode = this.node.getChildByName("SelectLevel_Button");
+        tx = dx + tx + btnSize;
+        tx = dx + tx + btnSize;
+        tx = dx + tx + btnSize;
+        this.changeSize(tnode, btnSize, tx+5, -ty - btsY - btnSize / 2);
+
     },
     onLoad() {
+        this.cCzie();
         var node = cc.director.getScene().getChildByName('userInfo');
+        //var node=cc.find("InfoNode");
         var data = node.getComponent('userInfo').getdata();
         this.user = data.user;
         this.password = data.password;
         this.getUsersInfo();
     },
-    start () {
+    start() {
         this.drawGrids();
         this.initLoadList();
-         //获取触碰到的方块的索引i j
+        //获取触碰到的方块的索引i j
         var self = this;
         self.canvas.on(cc.Node.EventType.TOUCH_START, function (event) {
             this.touchedEvent(event);
         }, self);
     },
     //判断是否通关
-    judgeAccom(){
-        this.isAccmp=true;
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
+    judgeAccom() {
+        this.isAccmp = true;
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 //如果当前格子没有细胞，但是通关要求此处有细胞，则未通关
-                if(ExitCell[i][j]==0){
-                    for(let k=0;k<GridData.levelsEnd[level].length;k++)
-                    {
-                        let m=GridData.levelsEnd[level][k].x;
-                        let n=GridData.levelsEnd[level][k].y;
-                        if(m==i&&n==j){
-                            this.isAccmp=false;
+                if (ExitCell[i][j] == 0) {
+                    for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
+                        let m = GridData.levelsEnd[level][k].x;
+                        let n = GridData.levelsEnd[level][k].y;
+                        if (m == i && n == j) {
+                            this.isAccmp = false;
                         }
                     }
                 }
                 //如果当前格子有细胞，但是通关要求此处没有细胞，则未通关
-                else{
-                    let hasfind=false;
-                    for(let k=0;k<GridData.levelsEnd[level].length;k++)
-                    {
-                        let m=GridData.levelsEnd[level][k].x;
-                        let n=GridData.levelsEnd[level][k].y;
-                        if(m==i&&n==j){
-                            hasfind=true;
+                else {
+                    let hasfind = false;
+                    for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
+                        let m = GridData.levelsEnd[level][k].x;
+                        let n = GridData.levelsEnd[level][k].y;
+                        if (m == i && n == j) {
+                            hasfind = true;
                         }
                     }
-                    if(hasfind==false){
-                        this.isAccmp=false;
+                    if (hasfind == false) {
+                        this.isAccmp = false;
                     }
                 }
             }
         }
         //如果通关，执行通关操作
-        console.log("通关？",this.isAccmp);
-        if(this.isAccmp==true)
-        {
+        console.log("通关？", this.isAccmp);
+        if (this.isAccmp == true) {
             level++;
-            if(level>maxlevel)
-            {
-                maxlevel=level;
+            if (level > maxlevel) {
+                maxlevel = level;
                 this.updateUserRank();
             }
-            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="恭喜通关";
-            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="下一关"
-        }
-        else{
-            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string="失败";
-            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string="重来"
+            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
+            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
+        } else {
+            this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "失败";
+            this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "重来"
         }
         this.accomplish();
     },
-    accomplish(){
+    accomplish() {
 
-        this.SucessSprite.node.active=true;
-        this.SucessBackButton.node.active=true;
+        this.SucessSprite.node.active = true;
+        this.SucessBackButton.node.active = true;
 
     },
-    nextLevelClicked()
-    {
-        if(this.isAccmp==true)
-        {
+    nextLevelClicked() {
+        if (this.isAccmp == true) {
 
-            this.SucessSprite.node.active=false;
-            this.SucessBackButton.node.active=false;
-            if(level<GridData.levelsEnd.length){
+            this.SucessSprite.node.active = false;
+            this.SucessBackButton.node.active = false;
+            if (level < GridData.levelsEnd.length) {
                 this.loadlevel();
-                time=0.0;
+                time = 0.0;
             }
-        }
-        else
-        {
+        } else {
 
-            this.SucessSprite.node.active=false;
-            this.SucessBackButton.node.active=false;
+            this.SucessSprite.node.active = false;
+            this.SucessBackButton.node.active = false;
             this.resStart();
         }
 
     },
     //触摸事件
-    touchedEvent(event){
+    touchedEvent(event) {
         var touches = event.getTouches();
         var touchLoc = touches[0].getLocation();
 
         //获取触碰到的方块 i j
-        this.touchi=Math.floor((touchLoc.x-this.gap)/(this.blockSize+this.gap));
+        this.touchi = Math.floor((touchLoc.x - this.gap) / (this.blockSize + this.gap));
 
         //可能存在错误
-        this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
+        this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
-        if(this.touchj<ROWS&&available>0&&this.touchj>=0)
-        {
-            for(let i=0;i<ROWS;i++){
-                for(let j=0;j<COLUMNS;j++){
-                    lastCells[i][j]=ExitCell[i][j];
+        if (this.touchj < ROWS && available > 0 && this.touchj >= 0) {
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLUMNS; j++) {
+                    lastCells[i][j] = ExitCell[i][j];
                 }
             }
             available--;
-            this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
-            this.changeHasCellSprite(this.touchi,this.touchj);
-            ExitCell[this.touchi][this.touchj]=1;
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
+            this.changeHasCellSprite(this.touchi, this.touchj);
+            ExitCell[this.touchi][this.touchj] = 1;
         }
 
-        if(isshowNum==true)
-        {
+        if (isshowNum == true) {
             this.showNum();
-        }
-        else{
+        } else {
             this.hideNum();
         }
     },
     //根据当前的ExitCell更新blocks
-    updateCells(){
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
-                if(ExitCell[i][j]==1)
-                {
-                    this.changeHasCellSprite(i,j);
+    updateCells() {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                if (ExitCell[i][j] == 1) {
+                    this.changeHasCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
-                }
-                else{
-                    this.changeHasNotCellSprite(i,j);
+                } else {
+                    this.changeHasNotCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
             }
         }
-        if(isshowNum==true)
-        {
+        if (isshowNum == true) {
             this.showNum();
-        }
-        else{
+        } else {
             this.computeNumAround();
             this.hideNum();
         }
     },
     //显示或者隐藏通关要求
-    displayOrHideReq(){
-        if(display){
-            this.ShowRequireButtonLabel.string="隐藏通关要求"
-            for(let k=0;k<GridData.levelsEnd[level].length;k++)
-            {
-                let m=GridData.levelsEnd[level][k].x;
-                let n=GridData.levelsEnd[level][k].y;
+    displayOrHideReq() {
+        if (display) {
+            this.ShowRequireButtonLabel.string = "隐藏通关要求"
+            for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
+                let m = GridData.levelsEnd[level][k].x;
+                let n = GridData.levelsEnd[level][k].y;
 
-                this.blocks[m][n].color=cc.color(50,10,150,255);
+                this.blocks[m][n].color = cc.color(50, 10, 150, 255);
             }
-            display=false;
-        }else{
-            this.ShowRequireButtonLabel.string="显示通关要求"
+            display = false;
+        } else {
+            this.ShowRequireButtonLabel.string = "显示通关要求"
             this.updateCells();
-            display=true;
+            display = true;
         }
 
     },
     //载入关卡
-    loadlevel(){
+    loadlevel() {
         //更新当前关卡
         //首先清零
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 //this.blocks[i][j].color=cc.color(200,114,114,255);
-                this.changeHasNotCellSprite(i,j);
+                this.changeHasNotCellSprite(i, j);
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
-                ExitCell[i][j]=0;
+                ExitCell[i][j] = 0;
             }
         }
 
-        available=GridData.availableCell[level];
-        stepUse=GridData.stepUse[level];
-        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
+        available = GridData.availableCell[level];
+        stepUse = GridData.stepUse[level];
+        this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
         //载入数据
-        for(let k=0;k<GridData.levelsStart[level].length;k++)
-        {
-            let m=GridData.levelsStart[level][k].x;
-            let n=GridData.levelsStart[level][k].y;
+        for (let k = 0; k < GridData.levelsStart[level].length; k++) {
+            let m = GridData.levelsStart[level][k].x;
+            let n = GridData.levelsStart[level][k].y;
 
-           // this.blocks[m][n].color=cc.color(0,100,100,255);
-            this.changeHasCellSprite(m,n);
-            ExitCell[m][n]=1;
+            // this.blocks[m][n].color=cc.color(0,100,100,255);
+            this.changeHasCellSprite(m, n);
+            ExitCell[m][n] = 1;
         }
         //计算初始周围细胞数
         this.computeNumAround();
         this.hideNum();
     },
-    ShowHideNumButtonFun()
-    {
-        if(isshowNum==false)
-        {
+    ShowHideNumButtonFun() {
+        if (isshowNum == false) {
             this.showNum();
-            this.ShowHideButtonLabel.string="隐藏数字"
-        }
-        else
-        {
+            this.ShowHideButtonLabel.string = "隐藏数字"
+        } else {
             this.hideNum();
-            this.ShowHideButtonLabel.string="显示数字"
+            this.ShowHideButtonLabel.string = "显示数字"
         }
     },
     //显示周围细胞数目
-    showNum(){
-        isshowNum=true;
+    showNum() {
+        isshowNum = true;
         this.computeNumAround();
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
             }
         }
     },
     //重新开始
-    resStart(){
+    resStart() {
         this.loadlevel();
     },
     //隐藏周围细胞数目
-    hideNum(){
-        isshowNum=false;
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
+    hideNum() {
+        isshowNum = false;
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
             }
         }
     },
     //计算周围细胞数目
-    computeNumAround()
-    {
+    computeNumAround() {
         //暂时数组
-        let TempCell=new Array();
-        for(let i=0;i<ROWS;i++){
-            TempCell[i]=new Array();
-            for(let j=0;j<COLUMNS;j++){
-                TempCell[i][j]=0;
+        let TempCell = new Array();
+        for (let i = 0; i < ROWS; i++) {
+            TempCell[i] = new Array();
+            for (let j = 0; j < COLUMNS; j++) {
+                TempCell[i][j] = 0;
             }
         }
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
-                let aroundNum=0;
-                for(let k=-1;k<=1;k++)
-                {
-                    for(let l=-1;l<=1;l++)
-                    {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                let aroundNum = 0;
+                for (let k = -1; k <= 1; k++) {
+                    for (let l = -1; l <= 1; l++) {
                         //如果这个细胞不是自己，且未越界，且存在细胞，则周围细胞数+1
-                        if((k!=0||l!=0)&&
-                            (i+k)>=0&&(i+k)<ROWS&&
-                            (j+l)>=0&&(j+l)<COLUMNS&&
-                            (ExitCell[i+k][j+l]!=0))
-                        {
-                                aroundNum++;
+                        if ((k != 0 || l != 0) &&
+                            (i + k) >= 0 && (i + k) < ROWS &&
+                            (j + l) >= 0 && (j + l) < COLUMNS &&
+                            (ExitCell[i + k][j + l] != 0)) {
+                            aroundNum++;
                         }
                     }
                 }
-                TempCell[i][j]=aroundNum;
+                TempCell[i][j] = aroundNum;
             }
         }
-        CellNum=TempCell;
+        CellNum = TempCell;
     },
     //返回上一代细胞
-    returnLastCell(){
-        available++;
-        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
-        if(lastCells!=null)
-        {
-            for(let i=0;i<ROWS;i++){
-                for(let j=0;j<COLUMNS;j++){
-                    ExitCell[i][j]=lastCells[i][j];
+    returnLastCell() {
+        let changed = false;
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                if (ExitCell[i][j] != lastCells[i][j])
+                    changed = true;
+            }
+        }
+        if (changed) {
+            available++;
+        }
+
+        this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
+        if (lastCells != null) {
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLUMNS; j++) {
+                    ExitCell[i][j] = lastCells[i][j];
                 }
             }
             this.updateCells();
         }
 
     },
-    changeHasCellSprite(i,j){
-        let x=this.positions[i][j].x;
-        let y=this.positions[i][j].y;
+    changeHasCellSprite(i, j) {
+        let x = this.positions[i][j].x;
+        let y = this.positions[i][j].y;
 
-        let block=cc.instantiate(this.hasPrefab);
-        block.width=this.blockSize;
-        block.height=this.blockSize;
+        let block = cc.instantiate(this.hasPrefab);
+        block.width = this.blockSize;
+        block.height = this.blockSize;
         this.bg.addChild(block);
-        block.setPosition(cc.v2(x,y));
+        block.setPosition(cc.v2(x, y));
 
-        this.positions[i][j]=cc.v2(x,y);
+        this.positions[i][j] = cc.v2(x, y);
 
         this.blocks[i][j].destroy();
-        this.blocks[i][j]=block;
+        this.blocks[i][j] = block;
     },
-    changeHasNotCellSprite(i,j){
-        let x=this.positions[i][j].x;
-        let y=this.positions[i][j].y;
+    changeHasNotCellSprite(i, j) {
+        let x = this.positions[i][j].x;
+        let y = this.positions[i][j].y;
 
-        let block=cc.instantiate(this.blockPrefab);
-        block.width=this.blockSize;
-        block.height=this.blockSize;
+        let block = cc.instantiate(this.blockPrefab);
+        block.width = this.blockSize;
+        block.height = this.blockSize;
         this.bg.addChild(block);
-        block.setPosition(cc.v2(x,y));
+        block.setPosition(cc.v2(x, y));
 
-        this.positions[i][j]=cc.v2(x,y);
+        this.positions[i][j] = cc.v2(x, y);
 
         this.blocks[i][j].destroy();
-        this.blocks[i][j]=block;
+        this.blocks[i][j] = block;
     },
     //生成下一代细胞
-    nextGenCell(){
-        for(let i=0;i<ROWS;i++){
-            for(let j=0;j<COLUMNS;j++){
-                lastCells[i][j]=ExitCell[i][j];
+    nextGenCell() {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                lastCells[i][j] = ExitCell[i][j];
             }
         }
         this.computeNumAround();
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 //此处有细胞，且周围细胞数<2且>3，则该细胞死亡
-                if(ExitCell[i][j]==1&&(CellNum[i][j]<2||CellNum[i][j]>3)){
-                    this.changeHasNotCellSprite(i,j);
-                    ExitCell[i][j]=0;
+                if (ExitCell[i][j] == 1 && (CellNum[i][j] < 2 || CellNum[i][j] > 3)) {
+                    this.changeHasNotCellSprite(i, j);
+                    ExitCell[i][j] = 0;
                 }
 
                 //此处没有细胞，且周围细胞数为3，则生成一个细胞
-                if(ExitCell[i][j]==0&&CellNum[i][j]==3){
-                    this.changeHasCellSprite(i,j);
-                    ExitCell[i][j]=1;
+                if (ExitCell[i][j] == 0 && CellNum[i][j] == 3) {
+                    this.changeHasCellSprite(i, j);
+                    ExitCell[i][j] = 1;
                 }
             }
         }
-        if(stepUse>0)
-        {
+        if (stepUse > 0) {
             stepUse--;
-            this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
         }
 
-        if(isshowNum==true)
-        {
+        if (isshowNum == true) {
             this.showNum();
-        }
-        else{
+        } else {
             this.hideNum();
         }
-        if(stepUse==0)
-        {
-            if(available>0)
-            {
+        if (stepUse == 0) {
+            if (available > 0) {
                 available--;
-            }
-            else
-            {
+            } else {
                 this.judgeAccom();
             }
 
         }
 
     },
-    drawGrids(){
-        this.blockSize=(cc.winSize.width-this.gap*(COLUMNS+1))/COLUMNS;
-        let x=this.gap+this.blockSize/2;
-        let y=this.gap+this.blockSize/2+this.blockSize*4.0;
-        this.positions=new Array();
-        this.blocks=new Array();
-        for(let i=0;i<ROWS;i++){
-            this.positions[i]=new Array();
-            this.blocks[i]=new Array();
-            for(let j=0;j<COLUMNS;j++){
-                this.positions[i][j]=0;
+    drawGrids() {
+        this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
+        let x = this.gap + this.blockSize;
+        let y = this.gap + this.blockSize / 2 + this.blockSize * 4.0;
+        this.positions = new Array();
+        this.blocks = new Array();
+        for (let i = 0; i < ROWS; i++) {
+            this.positions[i] = new Array();
+            this.blocks[i] = new Array();
+            for (let j = 0; j < COLUMNS; j++) {
+                this.positions[i][j] = 0;
             }
         }
-        for( let j=0;j<ROWS;j++)
-        {
-            for(let i=0;i<COLUMNS;i++)
-            {
+        for (let j = 0; j < ROWS; j++) {
+            for (let i = 0; i < COLUMNS; i++) {
                 //实例化prefab
-                let block=cc.instantiate(this.blockPrefab);
-                block.width=this.blockSize;
-                block.height=this.blockSize;
+                let block = cc.instantiate(this.blockPrefab);
+                block.width = this.blockSize;
+                block.height = this.blockSize;
                 this.bg.addChild(block);
-                block.setPosition(cc.v2(x,y));
+                block.setPosition(cc.v2(x, y));
 
-                this.positions[i][j]=cc.v2(x,y);
-                this.blocks[i][j]=block;
+                this.positions[i][j] = cc.v2(x, y);
+                this.blocks[i][j] = block;
 
-                x+=this.gap+this.blockSize;
+                x += this.gap + this.blockSize;
             }
-            y+=this.gap+this.blockSize;
-            x=this.gap+this.blockSize/2;
+            y += this.gap + this.blockSize;
+            x = this.gap + this.blockSize;
         }
 
         this.loadlevel();
         this.hideNum();
     },
-    selectLevel(i)
-    {
-        level=i;
+    selectLevel(i) {
+        level = i;
         this.loadlevel();
     },
-     //初始化载入模型列表
-    initLoadList(){
-        this.items=[];
-        this.spacing=15;
-        this.content=this.scrollView.content;
-        this.itemNum=GridData.levelsStart.length;
-        this.content.height=this.itemNum*(this.itemTemplate.height+this.spacing)+this.spacing;
-        for(let k=0;k<this.itemNum;k++){
-            let item=cc.instantiate(this.itemTemplate);
+    //初始化载入模型列表
+    initLoadList() {
+        this.items = [];
+        this.spacing = 15;
+        this.content = this.scrollView.content;
+        this.itemNum = GridData.levelsStart.length;
+        this.content.height = this.itemNum * (this.itemTemplate.height + this.spacing) + this.spacing;
+        for (let k = 0; k < this.itemNum; k++) {
+            let item = cc.instantiate(this.itemTemplate);
             item.getComponent('LevelButton').setNumAndName(k);
             this.content.addChild(item);
-            item.setPosition(0,-item.height*(k+0.5)-this.spacing*(k+1)-30.0);
+            item.setPosition(0, -item.height * (k + 0.5) - this.spacing * (k + 1) - 30.0);
             this.items.push(item);
         }
     },
-    showScorollView(){
-        this.scrollView.node.active=true;
-        this.scrollViewBack.node.active=true;
-        for(let i=0;i<this.itemNum;i++)
-        {
-            if(i<maxlevel+1)
-            {
+    showScorollView() {
+        this.scrollView.node.active = true;
+        this.scrollViewBack.node.active = true;
+        for (let i = 0; i < this.itemNum; i++) {
+            if (i < maxlevel + 1) {
                 this.items[i].getComponent(cc.Button).interactable = true;
-            }
-            else
-            {
+            } else {
                 this.items[i].getComponent(cc.Button).interactable = false;
             }
 
         }
     },
     //隐藏载入模型列表
-    disableScorollView(){
-        this.scrollView.node.active=false;
-        this.scrollViewBack.node.active=false;
+    disableScorollView() {
+        this.scrollView.node.active = false;
+        this.scrollViewBack.node.active = false;
     },
     getUsersInfo: function () {
         //获得用户信息
@@ -527,7 +528,7 @@ cc.Class({
             if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
                 console.log("连接成功");
                 var response = xhr.responseText;
-                var obj2 = eval("(" + response + ")");
+                var obj2 = JSON.parse(response)
                 maxlevel = obj2.rank;
             }
         };
@@ -542,14 +543,13 @@ cc.Class({
         var ServerLink = "http://30517j992t.qicp.vip/users/updataUserRank"
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
-            }
+            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {}
         };
-        xhr.open("POST", ServerLink,false);
+        xhr.open("POST", ServerLink, false);
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
         xhr.send(str);
     },
-    update (dt) {
-        time+=dt;
+    update(dt) {
+        time += dt;
     },
 });

@@ -6,6 +6,7 @@ cc.Class({
         SUM: 100,
         PAGE_NUM: 8,
         arr: [],
+        flag: false,
         user: "admin",
         password: "123456",
         MyNameLabel: cc.Label,
@@ -20,6 +21,7 @@ cc.Class({
             type: cc.ScrollView,
             default: null,
         },
+        content: cc.Node
     },
     min: function (a, b) {
         if (a < b) return a;
@@ -38,41 +40,46 @@ cc.Class({
             }
         }
     },
-    getUsersInfo: function () {
-        //获得用户信息
-        /* this.user = "admin";
-        this.password = "123456";*/
-        this.totalInfo = [];
-        let that = this;
-        var str = "user=" + this.user + "&password=" + this.password;
-        //    var ServerLink = "http://localhost:3000/users/search";
-        var ServerLink = "http://30517j992t.qicp.vip/users/search"
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
-                console.log("连接成功");
-                var response = xhr.responseText;
-                var obj = {};
-                var obj2 = eval("(" + response + ")");
-                var url = obj2.head;
-                that.loadImgByUrl(that.MyHead, url, "jpg")
-                obj.name = that.user;
-                obj.rank = 1;
-                obj.gq = obj2.rank;
-                obj.head = obj2.head;
-                //我的信息显示
-                that.MyRankLabel.string = obj.gq + " 关";
-                that.MyNameLabel.string = obj.name;
-                that.totalInfo.push(obj);
-            }
-        };
-        xhr.open("POST", ServerLink, false);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-        xhr.send(str);
-    },
     getfriend: function () {
         //获得用户朋友信息
+        var url = "http://30517j992t.qicp.vip/users/getFriends";
         let that = this;
+        return new Promise((resolve, reject) => {
+            wx.request({
+                url: url,
+                data: {
+                    user: that.user
+                },
+                method: "POST",
+                header: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                success(res) {
+                    var data = res.data.data;
+                    var obj = {};
+                    obj.user_id = that.user;
+                    obj.friend_id = that.user;
+                    obj.friend_rank = that.totalInfo[0].gq;
+                    obj.friend_head = that.totalInfo[0].head;
+                    that.arr.push(obj);
+                    for (var i = 0; i < data.length; i++) {
+                        /*    obj.name=data[i].friend_id;
+                            obj.rank=1;
+                            obj.gq=data[i].friend_rank;*/
+                        that.arr.push(data[i]);
+                    }
+                    that.arr.sort(that.cmp("friend_rank"));
+                    that.prepareTo();
+                    that.load_recode(that.start_index);
+                    that.flag = true;
+                    resolve(res.data)
+                },
+                fail() {
+
+                }
+            });
+        });
+        /*let that = this;
         var str = "user=" + this.user;
         //    var ServerLink = "http://localhost:3000/users/getFriends";
         var ServerLink = "http://30517j992t.qicp.vip/users/getFriends"
@@ -82,7 +89,7 @@ cc.Class({
                 console.log("连接成功");
                 var response = xhr.responseText;
                 var obj = {};
-                var obj2 = eval("(" + response + ")");
+                var obj2 = JSON.parse(response);
                 var data = obj2.data;
                 obj.user_id = that.user;
                 obj.friend_id = that.user;
@@ -92,7 +99,7 @@ cc.Class({
                 for (var i = 0; i < data.length; i++) {
                     /*    obj.name=data[i].friend_id;
                         obj.rank=1;
-                        obj.gq=data[i].friend_rank;*/
+                        obj.gq=data[i].friend_rank;
                     that.arr.push(data[i]);
                 }
                 that.arr.sort(that.cmp("friend_rank"));
@@ -101,16 +108,31 @@ cc.Class({
         };
         xhr.open("POST", ServerLink, false);
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-        xhr.send(str);
+        xhr.send(str);*/
     },
-    onLoad() {
+    setbeforInfo: function () {
         var node = cc.director.getScene().getChildByName('userInfo');
         var data = node.getComponent('userInfo').getdata();
         this.user = data.user;
         this.password = data.password;
-        this.getUsersInfo();
+        this.rank = data.rank;
+        this.head = data.head;
+        var obj = {};
+        var url = this.head;
+        this.loadImgByUrl(this.MyHead, url, "jpg")
+        obj.name = this.user;
+        obj.rank = 1;
+        obj.gq = this.rank;
+        obj.head = this.head;
+        //我的信息显示
+        this.MyRankLabel.string = obj.gq + " 关";
+        this.MyNameLabel.string = obj.name;
+        this.totalInfo = [];
+        this.totalInfo.push(obj);
+    },
+    onLoad() {
+        this.setbeforInfo();
         this.getfriend();
-        this.prepareTo();
     },
     prepareTo() {
         var len = this.arr.length;
@@ -197,7 +219,9 @@ cc.Class({
         this.scroll_view.elastic = true; //加载结束后自动滚动回弹开启
     },
     update(dt) {
-        this.load_scroll_recode();
+        if(this.flag){
+            this.load_scroll_recode();
+        }
     },
     setImg: function (imgNode, spriteFrame) {
         imgNode.getComponent(cc.Sprite).spriteFrame = spriteFrame;
@@ -220,7 +244,7 @@ cc.Class({
     start() {
         this.start_y = this.content.y; //初始化起始y坐标
         this.start_index = 0; //100项数据里面的起始数据记录索引
-        this.load_recode(this.start_index);
+        //this.load_recode(this.start_index);
     },
     returnButtonClicked: function () {
         cc.director.loadScene("MainScene");

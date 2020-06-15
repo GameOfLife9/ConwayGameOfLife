@@ -44,7 +44,6 @@ cc.Class({
     setNumAndName(number,name){
         this.numberLabel.string=name;
         this.num=number;
-        console.log(this.num);
     },
     // update (dt) {},
 });

@@ -59,7 +59,7 @@ cc.Class({
         info.rank = rank;
         info.head = data.avatarUrl;
         info.openid = openid;
-        console.log("openid",openid);
+        console.log("openid", openid);
         userInfo.setdata(info);
     },
     start() {
@@ -102,7 +102,7 @@ cc.Class({
                     .then(res => {
                         console.log("获取关卡成功");
                         console.log(res);
-                        that.setNode(theRes, res.result.res.data.rank,res.result.openid);
+                        that.setNode(theRes, res.result.res.data.rank, res.result.openid);
                     })
                     .catch(res => {
                         console.log("获取关卡失败")
@@ -116,13 +116,34 @@ cc.Class({
                     .then(res => {
                         console.log("创建新用户成功");
                         console.log(res);
-                        that.setNode(theRes, 0,res.result.openid);
+                        that.postDataToWX();
+                        that.setNode(theRes, 0, res.result.openid);
                     })
                     .catch(res => {
                         console.log("创建新用户失败")
                     })
             })
         }
+    },
+    postDataToWX: function () {
+        //向微信保存最高分数
+        var kvDateList = new Array();
+        kvDateList.push({
+            key: "rank",
+            value: '0'
+        });
+        //托管游戏数据
+        return new Promise(function (resolve, reject) {
+            wx.setUserCloudStorage({
+                KVDataList: kvDateList,
+                success: function (res) {
+
+                },
+                fail: function (res) {
+
+                }
+            });
+        });
     },
     loginInfo() {
         let exportJson = {};

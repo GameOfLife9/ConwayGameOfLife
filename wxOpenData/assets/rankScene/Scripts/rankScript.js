@@ -29,8 +29,8 @@ cc.Class({
     },
     cmp: function (propertyName) {
         return function (object1, object2) {
-            var value1 = object1[propertyName];
-            var value2 = object2[propertyName];
+            var value1 = Number(object1[propertyName]);
+            var value2 = Number(object2[propertyName]);
             if (value1 > value2) {
                 return -1;
             } else if (value1 < value2) {
@@ -117,28 +117,30 @@ cc.Class({
     },
     getFriend: function (data) {
         let that = this;
-        let obj = {};
         let myobj = {};
-        that.arr = [];
+        this.arr = [];
         for (var i = 0; i < this.content._children.length; i++)
             this.content._children[i].destroy();
         this.start_y = this.content.y; //初始化起始y坐标
         this.start_index = 0; //100项数据里面的起始数据记录索引
         for (var i = 0; i < data.length; i++) {
+            let obj = {};
             obj.user_id = "0";
             obj.friend_id = data[i].nickname;
             obj.friend_rank = data[i].KVDataList[0].value;
             obj.friend_head = data[i].avatarUrl;
-            that.arr.push(obj);
             if (data[i].openid == this.openid) {
                 obj.user_id = this.openid;
                 myobj = obj;
             }
+            that.arr.push(obj);
+            console.log("obj",obj);
         }
         //我的信息显示
         this.loadImgByUrl(this.MyHead, myobj.friend_head, "jpg")
         this.MyRankLabel.string = myobj.friend_rank + " 关";
         this.MyNameLabel.string = myobj.friend_id;
+        console.log('1',that.arr);
         that.arr.sort(that.cmp("friend_rank"));
         console.log(that.arr);
         that.prepareTo();

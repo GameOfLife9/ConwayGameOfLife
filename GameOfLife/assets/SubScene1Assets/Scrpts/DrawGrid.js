@@ -107,8 +107,13 @@ cc.Class({
     },
     onLoad() {
 <<<<<<< HEAD
+<<<<<<< HEAD
         this.cCzie();
         var node = cc.director.getScene().getChildByName('userInfo');
+=======
+        //var node = cc.director.getScene().getChildByName('InforNode');
+        var node=cc.find("InfoNode");
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
         var data = node.getComponent('userInfo').getdata();
         maxlevel = data.rank;
 =======
@@ -118,6 +123,9 @@ cc.Class({
         this.user = data.user;
         this.password = data.password;
        // this.getUsersInfo();
+<<<<<<< HEAD
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
+=======
 >>>>>>> 27016e10461e503982a1714815d4d8664f621393
     },
     start() {
@@ -174,6 +182,9 @@ cc.Class({
             {
                 maxlevel=level;
                 //this.updateUserRank();
+<<<<<<< HEAD
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
+=======
 >>>>>>> 27016e10461e503982a1714815d4d8664f621393
             }
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";

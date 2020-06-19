@@ -9,6 +9,7 @@ var time = 0.0;
 var maxlevel = 0;
 var stepUse = 1;
 var available = 1;
+var increase=true;
 //暂时变量，之后删掉
 var display = true;
 //exitcell用于判断格子i j是否有细胞
@@ -197,7 +198,7 @@ cc.Class({
         this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
         if (this.touchj < ROWS && available > 0 && this.touchj >= 0&&this.touchi>=0&&this.touchi<COLUMNS) {
-           if(ExitCell[this.touchi][this.touchj] == 0)
+           if(ExitCell[this.touchi][this.touchj] == 0&&increase==true)
            {
             let lastCells = new Array();
             for (let i = 0; i < ROWS; i++) {
@@ -209,9 +210,25 @@ cc.Class({
             history[history.length]=lastCells;
             console.log("history length in touchedEvent Fun:"+history.length);
             available--;
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
             this.changeHasCellSprite(this.touchi, this.touchj);
             ExitCell[this.touchi][this.touchj] = 1;
+           }
+           if(ExitCell[this.touchi][this.touchj] == 1&&increase==false)
+           {
+            let lastCells = new Array();
+            for (let i = 0; i < ROWS; i++) {
+            lastCells[i] = new Array();
+                for (let j = 0; j < COLUMNS; j++) {
+                    lastCells[i][j] = ExitCell[i][j];
+                }
+            }
+            history[history.length]=lastCells;
+            console.log("history length in touchedEvent Fun:"+history.length);
+            available--;
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            this.changeHasNotCellSprite(this.touchi, this.touchj);
+            ExitCell[this.touchi][this.touchj] = 0;
            }
         }
 
@@ -276,7 +293,14 @@ cc.Class({
 
         available = GridData.availableCell[level];
         stepUse = GridData.stepUse[level];
-        this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
+        increase=GridData.increa[level]
+        if(increase==true)
+        {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
+        else{
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
         //载入数据
         for (let k = 0; k < GridData.levelsStart[level].length; k++) {
             let m = GridData.levelsStart[level][k].x;
@@ -368,8 +392,14 @@ cc.Class({
             available++;
         }
 
-        this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
-        if (history.length!=0) {
+        if(increase==true)
+        {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
+        else{
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
+         if (history.length!=0) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
                     ExitCell[i][j] = history[history.length-1][i][j];
@@ -444,7 +474,13 @@ cc.Class({
         }
         if (stepUse > 0) {
             stepUse--;
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
+            if(increase==true)
+            {
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            }
+            else{
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            }
         }
 
         if (isshowNum == true) {

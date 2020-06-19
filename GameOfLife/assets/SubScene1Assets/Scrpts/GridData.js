@@ -12,7 +12,7 @@ var levelsEnd=[];
 var availableCell=[];
 //存放每关 目标细胞分布是初始细胞分布需繁衍几代，注意点同上
 var stepUse=[];
-
+var increa=[];
 
 
 /////////////////////////////////////////////////////////////////////////////////关卡1
@@ -38,7 +38,7 @@ level1DataEnd[6] = cc.v2(7, 5);
 levelsEnd[0] = level1DataEnd;
 availableCell[0] = 1;
 stepUse[0] = 1;
-
+increa[0]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡2
 //存放关卡2（注意关卡2的索引为1）初始分布
@@ -75,7 +75,7 @@ levelsEnd[1]=level2DataEnd;
 //本关可放置一个细胞，目标分布是初始细胞繁衍1代后的分布
 availableCell[1]=2;
 stepUse[1]=1;
-
+increa[1]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡3
 var level3DataStart = [];
@@ -106,7 +106,7 @@ level3DataEnd[9] = cc.v2(9, 4);
 levelsEnd[2] = level3DataEnd;
 availableCell[2] = 3;
 stepUse[2] = 1;
-
+increa[2]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡4
 var level4DataStart = [];
@@ -143,7 +143,7 @@ level4DataEnd[13] = cc.v2(8, 7);
 levelsEnd[3] = level4DataEnd;
 availableCell[3] = 1;
 stepUse[3] = 2;
-
+increa[3]=true;
 
 
 /////////////////////////////////////////////////////////////////////////////////关卡5
@@ -184,7 +184,7 @@ level5DataEnd[13] = cc.v2(9, 5);
 levelsEnd[4] = level5DataEnd;
 availableCell[4] = 1;
 stepUse[4] = 2;
-
+increa[4]=true;
 
 
 /////////////////////////////////////////////////////////////////////////////////关卡6
@@ -227,7 +227,7 @@ level6DataEnd[9] = cc.v2(11, 3);
 levelsEnd[5] = level6DataEnd;
 availableCell[5] = 2;
 stepUse[5] = 2;
-
+increa[5]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡7
 var level7DataStart = [];
@@ -291,7 +291,7 @@ level7DataEnd[29] = cc.v2(11, 6);
 levelsEnd[6] = level7DataEnd;
 availableCell[6] = 2;
 stepUse[6] = 2;
-
+increa[6]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡8
 var level8DataStart = [];
@@ -339,7 +339,7 @@ level8DataEnd[18] = cc.v2(8, 2);
 levelsEnd[7] = level8DataEnd;
 availableCell[7] = 3;
 stepUse[7] = 2;
-
+increa[7]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡9
 var level9DataStart = [];
@@ -408,7 +408,7 @@ level9DataEnd[26] = cc.v2(4, 4);
 levelsEnd[8] = level9DataEnd;
 availableCell[8] = 3;
 stepUse[8] = 2;
-
+increa[8]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡10
 var level10DataStart = [];
@@ -466,7 +466,7 @@ level10DataEnd[23] = cc.v2(12, 4);
 levelsEnd[9] = level10DataEnd;
 availableCell[9] = 1;
 stepUse[9] = 3;
-
+increa[9]=true;
 
 
 /////////////////////////////////////////////////////////////////////////////////关卡11
@@ -534,7 +534,7 @@ level11DataEnd[28] = cc.v2(12, 6);
 levelsEnd[10] = level11DataEnd;
 availableCell[10] = 2;
 stepUse[10] = 3;
-
+increa[10]=true;
 
 /////////////////////////////////////////////////////////////////////////////////关卡12
 var level12DataStart = [];
@@ -600,7 +600,7 @@ level12DataEnd[30] = cc.v2(11, 5);
 levelsEnd[11] = level12DataEnd;
 availableCell[11] = 3;
 stepUse[11] = 3;
-
+increa[11]=true;
 
 
 
@@ -610,3 +610,4 @@ exports.levelsEnd=levelsEnd;
 exports.levelsStart=levelsStart;
 exports.availableCell=availableCell;
 exports.stepUse=stepUse;
+exports.increa=increa;

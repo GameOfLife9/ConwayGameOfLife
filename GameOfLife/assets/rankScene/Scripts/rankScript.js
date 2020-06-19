@@ -21,231 +21,54 @@ cc.Class({
             type: cc.ScrollView,
             default: null,
         },
-        content: cc.Node
+        content: cc.Node,
+        display: cc.Sprite
     },
-    min: function (a, b) {
-        if (a < b) return a;
-        else return b;
+    changeSize() {
+        let windowSize = cc.view.getVisibleSize();
+        let tWidth = windowSize.width;
+        let tHeight = windowSize.height;
+        let theW = 0.8333 * tWidth;
+        let theH = theW * 1.3;
+        let tnode = this.node.getChildByName("background2");
+        let ynode = this.node.getChildByName("title");
+        let theY = 0.012484 * tHeight + 20;
+        tnode.width = theW;
+        tnode.height = theH;
+        tnode.y = ynode.y - ynode.height / 2 - theY - theH / 2;
     },
-    cmp: function (propertyName) {
-        return function (object1, object2) {
-            var value1 = object1[propertyName];
-            var value2 = object2[propertyName];
-            if (value1 > value2) {
-                return -1;
-            } else if (value1 < value2) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    },
-    getfriend: function () {
-        //获得用户朋友信息
-        var url = "http://30517j992t.qicp.vip/users/getFriends";
-        let that = this;
-        return new Promise((resolve, reject) => {
-            wx.request({
-                url: url,
-                data: {
-                    user: that.user
-                },
-                method: "POST",
-                header: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                success(res) {
-                    var data = res.data.data;
-                    var obj = {};
-                    obj.user_id = that.user;
-                    obj.friend_id = that.user;
-                    obj.friend_rank = that.totalInfo[0].gq;
-                    obj.friend_head = that.totalInfo[0].head;
-                    that.arr.push(obj);
-                    for (var i = 0; i < data.length; i++) {
-                        /*    obj.name=data[i].friend_id;
-                            obj.rank=1;
-                            obj.gq=data[i].friend_rank;*/
-                        that.arr.push(data[i]);
-                    }
-                    that.arr.sort(that.cmp("friend_rank"));
-                    that.prepareTo();
-                    that.load_recode(that.start_index);
-                    that.flag = true;
-                    resolve(res.data)
-                },
-                fail() {
-
-                }
-            });
-        });
-        /*let that = this;
-        var str = "user=" + this.user;
-        //    var ServerLink = "http://localhost:3000/users/getFriends";
-        var ServerLink = "http://30517j992t.qicp.vip/users/getFriends"
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
-                console.log("连接成功");
-                var response = xhr.responseText;
-                var obj = {};
-                var obj2 = JSON.parse(response);
-                var data = obj2.data;
-                obj.user_id = that.user;
-                obj.friend_id = that.user;
-                obj.friend_rank = that.totalInfo[0].gq;
-                obj.friend_head = that.totalInfo[0].head;
-                that.arr.push(obj);
-                for (var i = 0; i < data.length; i++) {
-                    /*    obj.name=data[i].friend_id;
-                        obj.rank=1;
-                        obj.gq=data[i].friend_rank;
-                    that.arr.push(data[i]);
-                }
-                that.arr.sort(that.cmp("friend_rank"));
-                //    that.totalInfo.sort(that.cmp);
-            }
-        };
-        xhr.open("POST", ServerLink, false);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-        xhr.send(str);*/
-    },
-    setbeforInfo: function () {
+    setInfo() {
         var node = cc.director.getScene().getChildByName('userInfo');
         var data = node.getComponent('userInfo').getdata();
-        this.user = data.user;
-        this.password = data.password;
-        this.rank = data.rank;
-        this.head = data.head;
-        var obj = {};
-        var url = this.head;
-        this.loadImgByUrl(this.MyHead, url, "jpg")
-        obj.name = this.user;
-        obj.rank = 1;
-        obj.gq = this.rank;
-        obj.head = this.head;
-        //我的信息显示
-        this.MyRankLabel.string = obj.gq + " 关";
-        this.MyNameLabel.string = obj.name;
-        this.totalInfo = [];
-        this.totalInfo.push(obj);
+        this.openid = data.openid;
+        console.log(this.openid);
     },
     onLoad() {
-        this.setbeforInfo();
-        this.getfriend();
+        this.changeSize();
+        this.setInfo();
     },
-    prepareTo() {
-        var len = this.arr.length;
-        this.HIGH = len;
-        this.SUM = len;
-        this.value_set = [];
-        for (var i = 1; i <= len; i++) {
-            this.value_set.push(i);
-        }
-        this.content = this.scroll_view.content;
-        this.opt_item_set = [];
-        //每次加载3页
-        var total = this.min(this.PAGE_NUM * 3, this.SUM);
-        for (var i = 0; i < total; i++) {
-            var item = cc.instantiate(this.infoLabel);
-            this.content.addChild(item);
-            this.opt_item_set.push(item);
-        }
-        this.scroll_view.node.on("scroll-ended", this.on_scroll_ended.bind(this), this); //监听scrollview事件
-    },
-    load_recode: function (start_index) {
-        this.start_index = start_index;
-        var total = this.min(this.PAGE_NUM * 3, this.SUM);
-        for (var i = 0; i < total; i++) {
-            var label = this.opt_item_set[i].getChildByName("Label").getComponent(cc.Label);
-            //显示记录
-            var user_name = this.opt_item_set[i].getChildByName("name").getComponent(cc.Label);
-            var theRank = this.opt_item_set[i].getChildByName("rank").getComponent(cc.Label);
-            var node = this.opt_item_set[i].getChildByName("picture");
-            var theHead = node.getChildByName("head").getComponent(cc.Sprite);
-            var url = this.arr[this.start_index + i].friend_head;
-            this.loadImgByUrl(theHead, url, "jpg");
-            user_name.string = this.arr[this.start_index + i].friend_id;
-            theRank.string = this.arr[this.start_index + i].friend_rank;
-            label.string = this.value_set[this.start_index + i];
-            //        label.string+="哈";
-            if (this.user == this.arr[this.start_index + i].friend_id) {
-                this.MyPlace.string = this.start_index + i + 1;
-            }
-        }
-    },
-    load_scroll_recode: function () {
-        //向下加载数据
-        //当开始位置比value_set的长度小则代表没加载完
-        if (this.start_index + this.PAGE_NUM * 3 < this.value_set.length &&
-            this.content.y >= this.start_y + this.PAGE_NUM * 2 * this.HIGH) //content超过2个PAGE的高度
-        {
-            //_autoScrolling在引擎源码中负责处理scrollview的滚动动作
-            if (this.scroll_view._autoScrolling) { //等自动滚动结束后再加载防止滚动过快，直接跳到非常后的位置
-                this.scroll_view.elastic = false; //关闭回弹效果 美观
-                return;
-            }
-            var down_loaded = this.PAGE_NUM;
-            this.start_index += down_loaded;
 
-            if (this.start_index + this.PAGE_NUM * 3 > this.value_set.length) {
-                //超过数据范围的长度
-                var out_len = this.start_index + this.PAGE_NUM * 3 - this.value_set.length;
-                down_loaded -= out_len;
-                this.start_index -= out_len;
-            }
-            this.load_recode(this.start_index);
-            this.content.y -= down_loaded * this.HIGH;
-            return;
-        }
-        //向上加载
-        if (this.start_index > 0 && this.content.y <= this.start_y) {
-            if (this.scroll_view._autoScrolling) {
-                this.scroll_view.elastic = false;
-                return;
-            }
-            var up_loaded = this.PAGE_NUM;
-            this.start_index -= up_loaded;
-            if (this.start_index < 0) {
-                up_loaded += this.start_index;
-                this.start_index = 0;
-            }
-            this.load_recode(this.start_index);
-            this.content.y += up_loaded * this.HIGH;
-        }
-    },
-    on_scroll_ended: function () {
-        this.load_scroll_recode();
-        this.scroll_view.elastic = true; //加载结束后自动滚动回弹开启
-    },
-    update(dt) {
-        if(this.flag){
-            this.load_scroll_recode();
-        }
-    },
-    setImg: function (imgNode, spriteFrame) {
-        imgNode.getComponent(cc.Sprite).spriteFrame = spriteFrame;
-    },
-    loadImgByUrl: function (imgNode, remoteUrl, imageType) {
+    start() {
+        this.tex = new cc.Texture2D();
+        var openDataContext = wx.getOpenDataContext();
         let that = this;
-        if (!imageType) {
-            imageType = "png";
-        }
-        cc.loader.load({
-            url: remoteUrl,
-            type: imageType
-        }, function (err, texture) {
-            if (err) {
-                return;
+        openDataContext.postMessage({
+            text: "showRank",
+            data: {
+                openid:that.openid
             }
-            that.setImg(imgNode, new cc.SpriteFrame(texture));
         });
     },
-    start() {
-        this.start_y = this.content.y; //初始化起始y坐标
-        this.start_index = 0; //100项数据里面的起始数据记录索引
-        //this.load_recode(this.start_index);
-    },
+    /*  _updateSubDomainCanvas () {
+          if (!this.tex) {
+              return;
+          }
+          var openDataContext = wx.getOpenDataContext();
+          var sharedCanvas = openDataContext.canvas;
+          this.tex.initWithElement(sharedCanvas);
+          this.tex.handleLoadedTexture();
+          this.display.spriteFrame = new cc.SpriteFrame(this.tex);
+      },*/
     returnButtonClicked: function () {
         cc.director.loadScene("MainScene");
     }

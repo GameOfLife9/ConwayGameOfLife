@@ -1,12 +1,8 @@
 {
-  "title": "GameOfLife",
+  "title": "wxOpenData",
   "packageName": "",
-  "startScene": "8d2d956b-9762-4a02-8d77-9b9fca3b9ed3",
-  "excludeScenes": [
-    "2fcb99c5-538a-4c2e-8354-06f1076614c6",
-    "b8f50157-123c-47d2-a6d3-086e74d33e0f",
-    "0bff46c6-86cb-419e-bf6a-7ebbab740069"
-  ],
+  "startScene": "f8316ccc-a6d4-4923-aca9-62c4b27f4a3a",
+  "excludeScenes": [],
   "includeSDKBox": false,
   "orientation": {
     "landscapeLeft": true,
@@ -17,11 +13,11 @@
   "webOrientation": "auto",
   "inlineSpriteFrames": true,
   "inlineSpriteFrames_native": true,
-  "mergeStartScene": true,
+  "mergeStartScene": false,
   "optimizeHotUpdate": false,
-  "md5Cache": true,
+  "md5Cache": false,
   "encryptJs": true,
-  "xxteaKey": "eac3351a-78f0-4d",
+  "xxteaKey": "9d51fc38-1214-43",
   "zipCompressJs": true,
   "fb-instant-games": {},
   "android": {

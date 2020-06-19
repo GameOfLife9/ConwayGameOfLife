@@ -222,7 +222,11 @@
       "array": [
         0,
         0,
-        350.74028853269766,
+<<<<<<< HEAD
+        342.18828767032636,
+=======
+        275.2087512843091,
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
         0,
         0,
         0,
@@ -2475,7 +2479,7 @@
     "node": {
       "__id__": 47
     },
-    "_enabled": false,
+    "_enabled": true,
     "alignMode": 0,
     "_target": {
       "__id__": 46
@@ -2806,8 +2810,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "上一代细胞",
-    "_N$string": "上一代细胞",
+    "_string": "上一步",
+    "_N$string": "上一步",
     "_fontSize": 20,
     "_lineHeight": 40,
     "_enableWrapText": false,
@@ -2861,16 +2865,16 @@
     "node": {
       "__id__": 55
     },
-    "_enabled": false,
+    "_enabled": true,
     "alignMode": 0,
     "_target": {
-      "__id__": 2
+      "__id__": 54
     },
     "_alignFlags": 45,
-    "_left": 54.58699999999999,
-    "_right": 585.413,
-    "_top": 965.38,
-    "_bottom": 34.620000000000005,
+    "_left": 0,
+    "_right": 0,
+    "_top": 0,
+    "_bottom": 0,
     "_verticalCenter": 0,
     "_horizontalCenter": 0,
     "_isAbsLeft": true,

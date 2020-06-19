@@ -67,7 +67,7 @@ cc.Class({
         node.x = x;
         node.y = y;
     },
-    cCzie(){
+    cCzie() {
         let windowSize = cc.view.getVisibleSize();
         let tWidth = windowSize.width;
         let tHeight = windowSize.height;
@@ -96,23 +96,29 @@ cc.Class({
         tx = -tWidth / 2;
         tnode = this.node.getChildByName("Return_Button");
         tx = dx + tx + btnSize / 2;
-        this.changeSize(tnode, btnSize, tx-5, -ty - btsY - btnSize / 2);
+        this.changeSize(tnode, btnSize, tx - 5, -ty - btsY - btnSize / 2);
 
         tnode = this.node.getChildByName("SelectLevel_Button");
         tx = dx + tx + btnSize;
         tx = dx + tx + btnSize;
         tx = dx + tx + btnSize;
-        this.changeSize(tnode, btnSize, tx+5, -ty - btsY - btnSize / 2);
+        this.changeSize(tnode, btnSize, tx + 5, -ty - btsY - btnSize / 2);
 
     },
     onLoad() {
+<<<<<<< HEAD
         this.cCzie();
         var node = cc.director.getScene().getChildByName('userInfo');
-        //var node=cc.find("InfoNode");
+        var data = node.getComponent('userInfo').getdata();
+        maxlevel = data.rank;
+=======
+        //var node = cc.director.getScene().getChildByName('InforNode');
+        var node=cc.find("InfoNode");
         var data = node.getComponent('userInfo').getdata();
         this.user = data.user;
         this.password = data.password;
-        this.getUsersInfo();
+       // this.getUsersInfo();
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
     },
     start() {
         this.drawGrids();
@@ -158,9 +164,17 @@ cc.Class({
         console.log("通关？", this.isAccmp);
         if (this.isAccmp == true) {
             level++;
+<<<<<<< HEAD
             if (level > maxlevel) {
                 maxlevel = level;
                 this.updateUserRank();
+                this.postDataToWX();
+=======
+            if(level>maxlevel)
+            {
+                maxlevel=level;
+                //this.updateUserRank();
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
             }
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
@@ -351,6 +365,7 @@ cc.Class({
         CellNum = TempCell;
     },
     //返回上一代细胞
+<<<<<<< HEAD
     returnLastCell() {
         let changed = false;
         for (let i = 0; i < ROWS; i++) {
@@ -368,6 +383,27 @@ cc.Class({
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
                     ExitCell[i][j] = lastCells[i][j];
+=======
+    returnLastCell(){
+        let changed=false;
+        for(let i=0;i<ROWS;i++){
+            for(let j=0;j<COLUMNS;j++){
+                if(ExitCell[i][j]!=lastCells[i][j])
+                changed=true;
+            }
+        }
+        if(changed)
+        {
+            available++;
+        }
+
+        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
+        if(lastCells!=null)
+        {
+            for(let i=0;i<ROWS;i++){
+                for(let j=0;j<COLUMNS;j++){
+                    ExitCell[i][j]=lastCells[i][j];
+>>>>>>> 27016e10461e503982a1714815d4d8664f621393
                 }
             }
             this.updateCells();
@@ -517,37 +553,43 @@ cc.Class({
         this.scrollView.node.active = false;
         this.scrollViewBack.node.active = false;
     },
-    getUsersInfo: function () {
-        //获得用户信息
-        let that = this;
-        var str = "user=" + this.user + "&password=" + this.password;
-        //    var ServerLink = "http://localhost:3000/users/search";
-        var ServerLink = "http://30517j992t.qicp.vip/users/search"
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {
-                console.log("连接成功");
-                var response = xhr.responseText;
-                var obj2 = JSON.parse(response)
-                maxlevel = obj2.rank;
-            }
-        };
-        xhr.open("POST", ServerLink, false);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-        xhr.send(str);
-    },
     updateUserRank: function () {
-        let that = this;
-        var str = "user=" + this.user + "&rank=" + maxlevel;
-        //    var ServerLink = "http://localhost:3000/users/search";
-        var ServerLink = "http://30517j992t.qicp.vip/users/updataUserRank"
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status <= 400)) {}
-        };
-        xhr.open("POST", ServerLink, false);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-        xhr.send(str);
+        return new Promise(function (resolve, reject) {
+            wx.cloud.callFunction({
+                    name: "getOpenID",
+                    data: {
+                        action: "updata",
+                        rank: maxlevel
+                    }
+                })
+                .then(res => {
+                    console.log("更新关卡成功");
+                })
+                .catch(res => {
+                    console.log("更新关卡失败")
+                })
+        })
+    },
+    postDataToWX: function () {
+        //向微信保存最高分数
+        var kvDateList = new Array();
+        var maxx = String(maxlevel);
+        kvDateList.push({
+            key: "rank",
+            value: maxx
+        });
+        //托管游戏数据
+        wx.setUserCloudStorage({
+            KVDataList: kvDateList,
+            success: function (res) {
+                console.log("wx.setUserCloudStorage success");
+                console.log(res);
+            },
+            fail: function (res) {
+                console.log("wx.setUserCloudStorage fail");
+                console.log(res);
+            }
+        });
     },
     update(dt) {
         time += dt;

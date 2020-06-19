@@ -2,11 +2,7 @@
   "title": "GameOfLife",
   "packageName": "",
   "startScene": "8d2d956b-9762-4a02-8d77-9b9fca3b9ed3",
-  "excludeScenes": [
-    "2fcb99c5-538a-4c2e-8354-06f1076614c6",
-    "b8f50157-123c-47d2-a6d3-086e74d33e0f",
-    "0bff46c6-86cb-419e-bf6a-7ebbab740069"
-  ],
+  "excludeScenes": [],
   "includeSDKBox": false,
   "orientation": {
     "landscapeLeft": true,
@@ -14,7 +10,7 @@
     "portrait": false,
     "upsideDown": false
   },
-  "webOrientation": "auto",
+  "webOrientation": "portrait",
   "inlineSpriteFrames": true,
   "inlineSpriteFrames_native": true,
   "mergeStartScene": true,

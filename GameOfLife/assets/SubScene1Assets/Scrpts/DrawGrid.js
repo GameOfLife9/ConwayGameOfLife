@@ -197,12 +197,14 @@ cc.Class({
         var touchLoc = touches[0].getLocation();
 
         //获取触碰到的方块 i j
-        this.touchi = Math.floor((touchLoc.x - this.gap) / (this.blockSize + this.gap));
+        this.touchi = Math.floor((touchLoc.x - this.gap-this.blockSize/2) / (this.blockSize + this.gap));
 
         //可能存在错误
         this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
         if (this.touchj < ROWS && available > 0 && this.touchj >= 0) {
+           if(ExitCell[this.touchi][this.touchj] == 0)
+           {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
                     lastCells[i][j] = ExitCell[i][j];
@@ -212,6 +214,7 @@ cc.Class({
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
             this.changeHasCellSprite(this.touchi, this.touchj);
             ExitCell[this.touchi][this.touchj] = 1;
+           }
         }
 
         if (isshowNum == true) {

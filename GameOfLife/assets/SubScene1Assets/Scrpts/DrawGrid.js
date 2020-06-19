@@ -20,13 +20,7 @@ for (let i = 0; i < ROWS; i++) {
         ExitCell[i][j] = 0;
     }
 }
-var lastCells = new Array();
-for (let i = 0; i < ROWS; i++) {
-    lastCells[i] = new Array();
-    for (let j = 0; j < COLUMNS; j++) {
-        lastCells[i][j] = 0;
-    }
-}
+var history=new Array();
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum = new Array();
 for (let i = 0; i < ROWS; i++) {
@@ -202,14 +196,18 @@ cc.Class({
         //可能存在错误
         this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
-        if (this.touchj < ROWS && available > 0 && this.touchj >= 0) {
+        if (this.touchj < ROWS && available > 0 && this.touchj >= 0&&this.touchi>=0&&this.touchi<COLUMNS) {
            if(ExitCell[this.touchi][this.touchj] == 0)
            {
+            let lastCells = new Array();
             for (let i = 0; i < ROWS; i++) {
+            lastCells[i] = new Array();
                 for (let j = 0; j < COLUMNS; j++) {
                     lastCells[i][j] = ExitCell[i][j];
                 }
             }
+            history[history.length]=lastCells;
+            console.log("history length in touchedEvent Fun:"+history.length);
             available--;
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
             this.changeHasCellSprite(this.touchi, this.touchj);
@@ -265,6 +263,8 @@ cc.Class({
     loadlevel() {
         //更新当前关卡
         //首先清零
+        history=new Array();
+        console.log("history length in LoadLevel Fun:"+history.length);
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
                 //this.blocks[i][j].color=cc.color(200,114,114,255);
@@ -354,26 +354,36 @@ cc.Class({
     //返回上一代细胞
     returnLastCell() {
         let changed = false;
-        for (let i = 0; i < ROWS; i++) {
-            for (let j = 0; j < COLUMNS; j++) {
-                if (ExitCell[i][j] != lastCells[i][j])
-                    changed = true;
+        if(history.length!=0)
+        {
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLUMNS; j++) {
+                    if (ExitCell[i][j] != history[history.length-1][i][j])
+                        changed = true;
+                }
             }
         }
+
         if (changed) {
             available++;
         }
 
         this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可下" + available + "个棋子，\n目标分布为繁衍" + stepUse + "代后的分布";
-        if (lastCells != null) {
+        if (history.length!=0) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
-                    ExitCell[i][j] = lastCells[i][j];
+                    ExitCell[i][j] = history[history.length-1][i][j];
                 }
             }
             this.updateCells();
         }
-
+        let arrTemp=new Array();
+        for(let i=0;i<history.length-1;i++)
+        {
+            arrTemp[i]=history[i];
+        }
+        history=arrTemp;
+        console.log("history length in returnLastCell Fun:"+history.length);
     },
     changeHasCellSprite(i, j) {
         let x = this.positions[i][j].x;
@@ -407,11 +417,15 @@ cc.Class({
     },
     //生成下一代细胞
     nextGenCell() {
+        let lastCells = new Array();
         for (let i = 0; i < ROWS; i++) {
+        lastCells[i] = new Array();
             for (let j = 0; j < COLUMNS; j++) {
                 lastCells[i][j] = ExitCell[i][j];
             }
         }
+        history[history.length]=lastCells;
+        console.log("history length in nextGenCell Fun:"+history.length);
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {

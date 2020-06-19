@@ -132,7 +132,7 @@ cc.Class({
         //可能存在错误
         //this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
         this.touchj = Math.floor((touchLoc.y - cc.winSize.height * 0.15 + this.blockSize / 2.0) / (this.blockSize + this.gap));
-        if (this.touchj < ROWS && this.touchj >= 0) {
+        if (this.touchj < ROWS && this.touchj >= 0&&this.touchi>=0&&this.touchi<COLUMNS) {
             let ii=this.touchi-centerx;
             let jj=this.touchj-centery;
             ii+=Math.floor(OROWS/2);
@@ -495,8 +495,14 @@ cc.Class({
                 CellNum[i][j] = 0;
             }
         }
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                this.changeHasNotCellSprite(i, j);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
+            }
+        }
         //this.nextGenCell();
-        this.updateCells();
+        //this.updateCells();
     },
     //细胞不停地繁殖，时间间隔为timegap，单位秒
     update(dt) {

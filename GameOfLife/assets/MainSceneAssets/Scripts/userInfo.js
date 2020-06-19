@@ -5,13 +5,13 @@ cc.Class({
     properties: {
 
     },
-    onLoad(){
+    start () {
         cc.game.addPersistRootNode(this.node);
     },
-    setdata(json){
+    setdata : function(json){
         this.data = json;
     },
-    getdata(){
+    getdata : function(){
         return this.data;
     },
 

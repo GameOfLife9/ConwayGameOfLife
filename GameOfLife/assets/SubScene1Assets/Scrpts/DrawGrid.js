@@ -106,27 +106,10 @@ cc.Class({
 
     },
     onLoad() {
-<<<<<<< HEAD
-<<<<<<< HEAD
         this.cCzie();
         var node = cc.director.getScene().getChildByName('userInfo');
-=======
-        //var node = cc.director.getScene().getChildByName('InforNode');
-        var node=cc.find("InfoNode");
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
         var data = node.getComponent('userInfo').getdata();
         maxlevel = data.rank;
-=======
-        //var node = cc.director.getScene().getChildByName('InforNode');
-        var node=cc.find("InfoNode");
-        var data = node.getComponent('userInfo').getdata();
-        this.user = data.user;
-        this.password = data.password;
-       // this.getUsersInfo();
-<<<<<<< HEAD
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
-=======
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
     },
     start() {
         this.drawGrids();
@@ -172,20 +155,10 @@ cc.Class({
         console.log("通关？", this.isAccmp);
         if (this.isAccmp == true) {
             level++;
-<<<<<<< HEAD
             if (level > maxlevel) {
                 maxlevel = level;
                 this.updateUserRank();
                 this.postDataToWX();
-=======
-            if(level>maxlevel)
-            {
-                maxlevel=level;
-                //this.updateUserRank();
-<<<<<<< HEAD
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
-=======
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
             }
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
@@ -376,7 +349,6 @@ cc.Class({
         CellNum = TempCell;
     },
     //返回上一代细胞
-<<<<<<< HEAD
     returnLastCell() {
         let changed = false;
         for (let i = 0; i < ROWS; i++) {
@@ -394,27 +366,6 @@ cc.Class({
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
                     ExitCell[i][j] = lastCells[i][j];
-=======
-    returnLastCell(){
-        let changed=false;
-        for(let i=0;i<ROWS;i++){
-            for(let j=0;j<COLUMNS;j++){
-                if(ExitCell[i][j]!=lastCells[i][j])
-                changed=true;
-            }
-        }
-        if(changed)
-        {
-            available++;
-        }
-
-        this.levelLabel.string="Lv:"+(level+1)+"  本关还可下"+available+"个棋子，\n目标分布为繁衍"+stepUse+"代后的分布";
-        if(lastCells!=null)
-        {
-            for(let i=0;i<ROWS;i++){
-                for(let j=0;j<COLUMNS;j++){
-                    ExitCell[i][j]=lastCells[i][j];
->>>>>>> 27016e10461e503982a1714815d4d8664f621393
                 }
             }
             this.updateCells();

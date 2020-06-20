@@ -7,25 +7,24 @@ var ROWS = 20;
 var COLUMNS = 20;
 var isshowNum = false;
 //当前关卡级数，用于loadLevel
-var OROWS=30;
-var OCOLUMNS=30;
+
 //暂时变量，之后删掉
 var display = true;
 //exitcell用于判断格子i j是否有细胞
 //blocks用于存储细胞实体
 var ExitCell = new Array();
-for (let i = 0; i < OROWS; i++) {
+for (let i = 0; i < ROWS; i++) {
     ExitCell[i] = new Array();
-    for (let j = 0; j < OCOLUMNS; j++) {
+    for (let j = 0; j < COLUMNS; j++) {
         ExitCell[i][j] = 0;
     }
 }
 
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum = new Array();
-for (let i = 0; i < OROWS; i++) {
+for (let i = 0; i < ROWS; i++) {
     CellNum[i] = new Array();
-    for (let j = 0; j < OCOLUMNS; j++) {
+    for (let j = 0; j < COLUMNS; j++) {
         CellNum[i][j] = 0;
     }
 }
@@ -127,22 +126,18 @@ cc.Class({
         var touchLoc = touches[0].getLocation();
 
         //获取触碰到的方块 i j
-        this.touchi = Math.floor((touchLoc.x - this.gap-this.blockSize/2) / (this.blockSize + this.gap));
+        this.touchi = Math.floor((touchLoc.x - this.gap) / (this.blockSize + this.gap));
 
         //可能存在错误
         //this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
         this.touchj = Math.floor((touchLoc.y - cc.winSize.height * 0.15 + this.blockSize / 2.0) / (this.blockSize + this.gap));
-        if (this.touchj < ROWS && this.touchj >= 0&&this.touchi>=0&&this.touchi<COLUMNS) {
-            let ii=this.touchi-centerx;
-            let jj=this.touchj-centery;
-            ii+=Math.floor(OROWS/2);
-            jj+=Math.floor(OCOLUMNS/2);
-            if (ExitCell[ii][jj] == 1) {
+        if (this.touchj < ROWS && this.touchj >= 0) {
+            if (ExitCell[this.touchi][this.touchj] == 1) {
                 this.changeHasNotCellSprite(this.touchi, this.touchj);
-                ExitCell[ii][jj] = 0;
+                ExitCell[this.touchi][this.touchj] = 0;
             } else {
                 this.changeHasCellSprite(this.touchi, this.touchj);
-                ExitCell[ii][jj] = 1;
+                ExitCell[this.touchi][this.touchj] = 1;
             }
         }
 
@@ -163,20 +158,12 @@ cc.Class({
     },
     //根据当前的ExitCell更新blocks
     updateCells() {
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
-                let ii=i-centerx+Math.floor(OROWS/2);
-                let jj=j-centery+Math.floor(OCOLUMNS/2);
-                
-                if(ExitCell[ii][jj]==1)
-                {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
-                }
-                else
-                {
+                } else {
                     this.changeHasNotCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
@@ -202,44 +189,54 @@ cc.Class({
     scaleIncrease() {
         //设置放大的上限为30*30
         if (ROWS < 30 && COLUMNS < 30) {
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
+            //用originData存储当前所有细胞的坐标值，以便缩放后进行重新计算
+            let originData = [];
+            let iter = 0;
+            for (let i = 0; i < (ROWS); i++) {
+                for (let j = 0; j < (COLUMNS); j++) {
+                    if (ExitCell[i][j] == 1) {
+                        //如果坐标i j处有细胞，我们就将此结果防止originData数组
+                        //注意，此处放回的数据重新以棋盘左下角为原点
+                        originData[iter] = cc.v2(i - centerx, j - centery);
+                        iter++;
+                    }
+                    //销毁所有blocks以便重新绘制
                     this.blocks[i][j].destroy();
                 }
             }
+            //放大，行列数加5
             ROWS += 5;
             COLUMNS += 5;
- 
+            //将数组重新生成，匹配当前的行数和列数
+            for (let i = 0; i < ROWS; i++) {
+                ExitCell[i] = new Array();
+                CellNum[i] = new Array();
+                for (let j = 0; j < COLUMNS; j++) {
+                    ExitCell[i][j] = 0;
+                    CellNum[i][j] = 0;
+                }
+            }
             //重新绘制棋盘
             this.drawGrids();
             //重新计算棋盘的中心点。
             centerx = Math.floor(ROWS / 2);
             centery = Math.floor((COLUMNS) / 2);
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
-                    let ii=i-centerx+Math.floor(OROWS/2);
-                    let jj=j-centery+Math.floor(OCOLUMNS/2);
-                    if(ExitCell[ii][jj]==1)
-                    {
-                        this.changeHasCellSprite(i, j);
-                        this.blocks[i][j].getComponent('NumText').setNumber(0);
-                    }
-                    else
-                    {
-                        this.changeHasNotCellSprite(i, j);
-                        this.blocks[i][j].getComponent('NumText').setNumber(0);
-                    }
+            for (let k = 0; k < originData.length; k++) {
+                let m = originData[k].x + centerx;
+                let n = originData[k].y + centery;
+                //TODO：为了保证数组不越界我做了限制，但实际上这存在错误，因为越界的信息丢失了
+                if (m >= 0 && m < COLUMNS && n >= 0 && n < ROWS) {
+                    this.changeHasCellSprite(m, n);
+                    ExitCell[m][n] = 1;
+                } else {
+                    console.log("Function Loadmodel out index");
                 }
             }
         }
 
     },
     changeHasCellSprite(i, j) {
-        let x = this.positions[i][j].x;
+        /*let x = this.positions[i][j].x;
         let y = this.positions[i][j].y;
 
         let block = cc.instantiate(this.hasPrefab);
@@ -251,10 +248,12 @@ cc.Class({
         this.positions[i][j] = cc.v2(x, y);
 
         this.blocks[i][j].destroy();
-        this.blocks[i][j] = block;
+        this.blocks[i][j] = block;*/
+        this.blocks[i][j]._children[0].active=false;
+        this.blocks[i][j]._children[1].active=true;
     },
     changeHasNotCellSprite(i, j) {
-        let x = this.positions[i][j].x;
+        /*let x = this.positions[i][j].x;
         let y = this.positions[i][j].y;
 
         let block = cc.instantiate(this.blockPrefab);
@@ -265,43 +264,47 @@ cc.Class({
 
         this.positions[i][j] = cc.v2(x, y);
 
-        this.blocks[i][j].destroy();
-        this.blocks[i][j] = block;
+        this.blocks[i][j].destroy();*/
+        this.blocks[i][j]._children[0].active=true;
+        this.blocks[i][j]._children[1].active=false;
     },
     //此处缩小函数的作用同放大函数
     scaleDecrease() {
         if (ROWS > 15 && COLUMNS > 15) {
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
+            let originData = [];
+            let iter = 0;
+            for (let i = 0; i < (ROWS); i++) {
+                for (let j = 0; j < (COLUMNS); j++) {
+                    if (ExitCell[i][j] == 1) {
+                        originData[iter] = cc.v2(i - centerx, j - centery);
+                        iter++;
+                    }
                     this.blocks[i][j].destroy();
                 }
             }
+
             ROWS -= 5;
             COLUMNS -= 5;
+            for (let i = 0; i < ROWS; i++) {
+                ExitCell[i] = new Array();
+                for (let j = 0; j < COLUMNS; j++) {
+                    ExitCell[i][j] = 0;
+                }
+            }
 
-            //重新绘制棋盘
             this.drawGrids();
-            //重新计算棋盘的中心点。
+
             centerx = Math.floor(ROWS / 2);
-            centery = Math.floor((COLUMNS) / 2);
-            for(let i=0;i<ROWS;i++)
-            {
-                for(let j=0;j<COLUMNS;j++)
-                {
-                    let ii=i-centerx+Math.floor(OROWS/2);
-                    let jj=j-centery+Math.floor(OCOLUMNS/2);
-                    if(ExitCell[ii][jj]==1)
-                    {
-                        this.changeHasCellSprite(i, j);
-                        this.blocks[i][j].getComponent('NumText').setNumber(0);
-                    }
-                    else
-                    {
-                        this.changeHasNotCellSprite(i, j);
-                        this.blocks[i][j].getComponent('NumText').setNumber(0);
-                    }
+            centery = Math.floor(COLUMNS / 2);
+            for (let k = 0; k < originData.length; k++) {
+                let m = originData[k].x + centerx;
+                let n = originData[k].y + centery;
+
+                if (m >= 0 && m < COLUMNS && n >= 0 && n < ROWS) {
+                    this.changeHasCellSprite(m, n);
+                    ExitCell[m][n] = 1;
+                } else {
+                    console.log("Function Loadmodel out index");
                 }
             }
         }
@@ -317,41 +320,27 @@ cc.Class({
         centerx = Math.floor(ROWS / 2);
         centery = Math.floor((COLUMNS) / 2);
         //首先清零
-        for (let i = 0; i < OROWS; i++) {
-            for (let j = 0; j < OCOLUMNS; j++) {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
+                this.changeHasNotCellSprite(i, j);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
                 ExitCell[i][j] = 0;
             }
         }
         //载入数据
         for (let k = 0; k < ModelData.modelDatas[modelNum].length; k++) {
-            let m = ModelData.modelDatas[modelNum][k].x + Math.floor(OROWS / 2);
-            let n = ModelData.modelDatas[modelNum][k].y + Math.floor(OCOLUMNS / 2);
+            let m = ModelData.modelDatas[modelNum][k].x + centerx;
+            let n = ModelData.modelDatas[modelNum][k].y + centery;
 
-            if (m >= 0 && m < OCOLUMNS && n >= 0 && n < OROWS) {
+            if (m >= 0 && m < COLUMNS && n >= 0 && n < ROWS) {
+                this.changeHasCellSprite(m, n);
                 ExitCell[m][n] = 1;
             } else {
                 console.log("Function Loadmodel out index");
             }
 
         }
-        for(let i=0;i<ROWS;i++)
-        {
-            for(let j=0;j<COLUMNS;j++)
-            {
-                let ii=i-centerx+Math.floor(OROWS/2);
-                let jj=j-centery+Math.floor(OCOLUMNS/2);
-                if(ExitCell[ii][jj]==1)
-                {
-                    this.changeHasCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0);
-                }
-                else
-                {
-                    this.changeHasNotCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0);
-                }
-            }
-        }
+
 
         this.hideNum();
         //计算初始周围细胞数
@@ -363,9 +352,7 @@ cc.Class({
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
-                let ii=i-centerx+Math.floor(OROWS/2);
-                let jj=j-centery+Math.floor(OCOLUMNS/2);
-                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[ii][jj]);
+                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
             }
         }
     },
@@ -373,14 +360,14 @@ cc.Class({
     computeNumAround() {
         //暂时数组
         let TempCell = new Array();
-        for (let i = 0; i < OROWS; i++) {
+        for (let i = 0; i < ROWS; i++) {
             TempCell[i] = new Array();
-            for (let j = 0; j < OCOLUMNS; j++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 TempCell[i][j] = 0;
             }
         }
-        for (let i = 0; i < OROWS; i++) {
-            for (let j = 0; j < OCOLUMNS; j++) {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 let aroundNum = 0;
                 for (let k = -1; k <= 1; k++) {
                     for (let l = -1; l <= 1; l++) {
@@ -403,13 +390,15 @@ cc.Class({
     nextGenCell() {
 
         this.computeNumAround();
-        for (let i = 0; i < OROWS; i++) {
-            for (let j = 0; j < OCOLUMNS; j++) {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 //此处有细胞，且周围细胞数不等于可存活数目，则该细胞死亡
                 if (ExitCell[i][j] == 1) {
+                    this.changeHasNotCellSprite(i, j);
                     ExitCell[i][j] = 0;
                     for (let p = 0; p < ModelData.surviveNums[ModelIndex].length; p++) {
                         if (CellNum[i][j] == ModelData.surviveNums[ModelIndex][p]) {
+                            this.changeHasCellSprite(i, j);
                             ExitCell[i][j] = 1;
                         }
                     }
@@ -420,18 +409,23 @@ cc.Class({
                 else {
                     for (let p = 0; p < ModelData.bornNums[ModelIndex].length; p++) {
                         if (CellNum[i][j] == ModelData.bornNums[ModelIndex][p]) {
+                            this.changeHasCellSprite(i, j);
                             ExitCell[i][j] = 1;
                         }
                     }
                 }
             }
         }
-        this.updateCells();
+        if (isshowNum == true) {
+            this.showNum();
+        } else {
+            this.hideNum();
+        }
     },
     //这个函数是初始化棋盘的函数
     drawGrids() {
         //动态地设置间隔
-        this.gap = 1;
+        this.gap = 0.7;
 
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
 
@@ -462,7 +456,7 @@ cc.Class({
                 this.positions[i][j] = cc.v2(x, y);
 
                 this.blocks[i][j] = block;
-
+//                this.blocks[i][j]._children[0].active=false;
                 x += this.gap + this.blockSize;
             }
             y += this.gap + this.blockSize;
@@ -489,20 +483,14 @@ cc.Class({
     },
     //清除所有细胞
     clearButton() {
-        for (let i = 0; i < OROWS; i++) {
-            for (let j = 0; j < OCOLUMNS; j++) {
+        for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLUMNS; j++) {
                 ExitCell[i][j] = 0;
                 CellNum[i][j] = 0;
             }
         }
-        for (let i = 0; i < ROWS; i++) {
-            for (let j = 0; j < COLUMNS; j++) {
-                this.changeHasNotCellSprite(i, j);
-                this.blocks[i][j].getComponent('NumText').setNumber(0);
-            }
-        }
-        //this.nextGenCell();
-        //this.updateCells();
+        this.nextGenCell();
+        this.updateCells();
     },
     //细胞不停地繁殖，时间间隔为timegap，单位秒
     update(dt) {

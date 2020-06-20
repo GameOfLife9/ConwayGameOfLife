@@ -416,7 +416,7 @@ cc.Class({
         console.log("history length in returnLastCell Fun:"+history.length);
     },
     changeHasCellSprite(i, j) {
-        let x = this.positions[i][j].x;
+        /*let x = this.positions[i][j].x;
         let y = this.positions[i][j].y;
 
         let block = cc.instantiate(this.hasPrefab);
@@ -428,10 +428,12 @@ cc.Class({
         this.positions[i][j] = cc.v2(x, y);
 
         this.blocks[i][j].destroy();
-        this.blocks[i][j] = block;
+        this.blocks[i][j] = block;*/
+        this.blocks[i][j]._children[0].active=false;
+        this.blocks[i][j]._children[1].active=true;
     },
     changeHasNotCellSprite(i, j) {
-        let x = this.positions[i][j].x;
+        /*let x = this.positions[i][j].x;
         let y = this.positions[i][j].y;
 
         let block = cc.instantiate(this.blockPrefab);
@@ -443,7 +445,9 @@ cc.Class({
         this.positions[i][j] = cc.v2(x, y);
 
         this.blocks[i][j].destroy();
-        this.blocks[i][j] = block;
+        this.blocks[i][j] = block;*/
+        this.blocks[i][j]._children[0].active=true;
+        this.blocks[i][j]._children[1].active=false;
     },
     //生成下一代细胞
     nextGenCell() {

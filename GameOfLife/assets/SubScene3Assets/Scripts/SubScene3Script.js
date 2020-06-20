@@ -169,8 +169,8 @@ cc.Class({
     },
     //根据当前的ExitCell更新blocks
     updateCells() {
-        for (let i = theI; i < theI + ROWS; i++) {
-            for (let j = theJ; j < theJ + COLUMNS; j++) {
+        for (let i = 0; i < THEMAX; i++) {
+            for (let j = 0; j < THEMAX; j++) {
                 if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
@@ -284,10 +284,10 @@ cc.Class({
         ModelIndex = modelNum;
         //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
         centerx = Math.floor(ROWS / 2);
-        centery = Math.floor((COLUMNS) / 2);
+        centery = Math.floor(COLUMNS / 2);
         //首先清零
-        for (let i = theI; i < theI + ROWS; i++) {
-            for (let j = theJ; j < theJ + COLUMNS; j++) {
+        for (let i = 0; i < THEMAX; i++) {
+            for (let j = 0; j < THEMAX; j++) {
                 this.changeHasNotCellSprite(i, j);
                 this.blocks[i][j].getComponent('NumText').setNumber(0);
                 ExitCell[i][j] = 0;
@@ -474,8 +474,8 @@ cc.Class({
     },
     //清除所有细胞
     clearButton() {
-        for (let i = theI; i < theI + ROWS; i++) {
-            for (let j = theJ; j < theJ + COLUMNS; j++) {
+        for (let i = 0; i < THEMAX; i++) {
+            for (let j = 0; j < THEMAX; j++) {
                 ExitCell[i][j] = 0;
                 CellNum[i][j] = 0;
             }

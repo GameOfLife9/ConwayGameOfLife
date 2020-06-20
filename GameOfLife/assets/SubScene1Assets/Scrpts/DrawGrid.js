@@ -9,7 +9,9 @@ var time = 0.0;
 var maxlevel = 0;
 var stepUse = 1;
 var available = 1;
-var increase=true;
+var increase = true;
+var theRows = new Array(); //鼠标行坐标
+var theCol = new Array();//鼠标列坐标
 //暂时变量，之后删掉
 var display = true;
 //exitcell用于判断格子i j是否有细胞
@@ -21,7 +23,7 @@ for (let i = 0; i < ROWS; i++) {
         ExitCell[i][j] = 0;
     }
 }
-var history=new Array();
+var history = new Array();
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum = new Array();
 for (let i = 0; i < ROWS; i++) {
@@ -192,44 +194,58 @@ cc.Class({
         var touchLoc = touches[0].getLocation();
 
         //获取触碰到的方块 i j
-        this.touchi = Math.floor((touchLoc.x - this.gap-this.blockSize/2) / (this.blockSize + this.gap));
+        this.touchj = -1;
+        this.touchi = -1;
+        for (let i = 0; i < ROWS; i++) {
+            if (touchLoc.y > theRows[i][1]) continue;
+            if (touchLoc.y >= theRows[i][0]) {
+                this.touchj = i;
+                break;
+            } else break;
+        }
+        for (let i = 0; i < COLUMNS; i++) {
+            if (touchLoc.x > theCol[i][1]) continue;
+            if (touchLoc.x >= theCol[i][0]) {
+                this.touchi = i;
+                break;
+            } else break;
+        }
+        //this.touchi = Math.floor((touchLoc.x - this.gap - this.blockSize / 2) / (this.blockSize + this.gap));
 
         //可能存在错误
-        this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
+        //this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
-        if (this.touchj < ROWS && available > 0 && this.touchj >= 0&&this.touchi>=0&&this.touchi<COLUMNS) {
-           if(ExitCell[this.touchi][this.touchj] == 0&&increase==true)
-           {
-            let lastCells = new Array();
-            for (let i = 0; i < ROWS; i++) {
-            lastCells[i] = new Array();
-                for (let j = 0; j < COLUMNS; j++) {
-                    lastCells[i][j] = ExitCell[i][j];
+        if (available > 0 && this.touchj != -1 && this.touchi != -1) {
+            if (ExitCell[this.touchi][this.touchj] == 0 && increase == true) {
+                let lastCells = new Array();
+                for (let i = 0; i < ROWS; i++) {
+                    lastCells[i] = new Array();
+                    for (let j = 0; j < COLUMNS; j++) {
+                        lastCells[i][j] = ExitCell[i][j];
+                    }
                 }
+                history[history.length] = lastCells;
+                console.log("history length in touchedEvent Fun:" + history.length);
+                available--;
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+                this.changeHasCellSprite(this.touchi, this.touchj);
+                ExitCell[this.touchi][this.touchj] = 1;
             }
-            history[history.length]=lastCells;
-            console.log("history length in touchedEvent Fun:"+history.length);
-            available--;
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            this.changeHasCellSprite(this.touchi, this.touchj);
-            ExitCell[this.touchi][this.touchj] = 1;
-           }
-           if(ExitCell[this.touchi][this.touchj] == 1&&increase==false)
-           {
-            let lastCells = new Array();
-            for (let i = 0; i < ROWS; i++) {
-            lastCells[i] = new Array();
-                for (let j = 0; j < COLUMNS; j++) {
-                    lastCells[i][j] = ExitCell[i][j];
+            if (ExitCell[this.touchi][this.touchj] == 1 && increase == false) {
+                let lastCells = new Array();
+                for (let i = 0; i < ROWS; i++) {
+                    lastCells[i] = new Array();
+                    for (let j = 0; j < COLUMNS; j++) {
+                        lastCells[i][j] = ExitCell[i][j];
+                    }
                 }
+                history[history.length] = lastCells;
+                console.log("history length in touchedEvent Fun:" + history.length);
+                available--;
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+                this.changeHasNotCellSprite(this.touchi, this.touchj);
+                ExitCell[this.touchi][this.touchj] = 0;
             }
-            history[history.length]=lastCells;
-            console.log("history length in touchedEvent Fun:"+history.length);
-            available--;
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            this.changeHasNotCellSprite(this.touchi, this.touchj);
-            ExitCell[this.touchi][this.touchj] = 0;
-           }
         }
 
         if (isshowNum == true) {
@@ -280,8 +296,8 @@ cc.Class({
     loadlevel() {
         //更新当前关卡
         //首先清零
-        history=new Array();
-        console.log("history length in LoadLevel Fun:"+history.length);
+        history = new Array();
+        console.log("history length in LoadLevel Fun:" + history.length);
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
                 //this.blocks[i][j].color=cc.color(200,114,114,255);
@@ -293,12 +309,10 @@ cc.Class({
 
         available = GridData.availableCell[level];
         stepUse = GridData.stepUse[level];
-        increase=GridData.increa[level]
-        if(increase==true)
-        {
+        increase = GridData.increa[level]
+        if (increase == true) {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        }
-        else{
+        } else {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
         }
         //载入数据
@@ -378,11 +392,10 @@ cc.Class({
     //返回上一代细胞
     returnLastCell() {
         let changed = false;
-        if(history.length!=0)
-        {
+        if (history.length != 0) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
-                    if (ExitCell[i][j] != history[history.length-1][i][j])
+                    if (ExitCell[i][j] != history[history.length - 1][i][j])
                         changed = true;
                 }
             }
@@ -392,28 +405,25 @@ cc.Class({
             available++;
         }
 
-        if(increase==true)
-        {
+        if (increase == true) {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        }
-        else{
+        } else {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
         }
-         if (history.length!=0) {
+        if (history.length != 0) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
-                    ExitCell[i][j] = history[history.length-1][i][j];
+                    ExitCell[i][j] = history[history.length - 1][i][j];
                 }
             }
             this.updateCells();
         }
-        let arrTemp=new Array();
-        for(let i=0;i<history.length-1;i++)
-        {
-            arrTemp[i]=history[i];
+        let arrTemp = new Array();
+        for (let i = 0; i < history.length - 1; i++) {
+            arrTemp[i] = history[i];
         }
-        history=arrTemp;
-        console.log("history length in returnLastCell Fun:"+history.length);
+        history = arrTemp;
+        console.log("history length in returnLastCell Fun:" + history.length);
     },
     changeHasCellSprite(i, j) {
         /*let x = this.positions[i][j].x;
@@ -429,8 +439,8 @@ cc.Class({
 
         this.blocks[i][j].destroy();
         this.blocks[i][j] = block;*/
-        this.blocks[i][j]._children[0].active=false;
-        this.blocks[i][j]._children[1].active=true;
+        this.blocks[i][j]._children[0].active = false;
+        this.blocks[i][j]._children[1].active = true;
     },
     changeHasNotCellSprite(i, j) {
         /*let x = this.positions[i][j].x;
@@ -446,20 +456,20 @@ cc.Class({
 
         this.blocks[i][j].destroy();
         this.blocks[i][j] = block;*/
-        this.blocks[i][j]._children[0].active=true;
-        this.blocks[i][j]._children[1].active=false;
+        this.blocks[i][j]._children[0].active = true;
+        this.blocks[i][j]._children[1].active = false;
     },
     //生成下一代细胞
     nextGenCell() {
         let lastCells = new Array();
         for (let i = 0; i < ROWS; i++) {
-        lastCells[i] = new Array();
+            lastCells[i] = new Array();
             for (let j = 0; j < COLUMNS; j++) {
                 lastCells[i][j] = ExitCell[i][j];
             }
         }
-        history[history.length]=lastCells;
-        console.log("history length in nextGenCell Fun:"+history.length);
+        history[history.length] = lastCells;
+        console.log("history length in nextGenCell Fun:" + history.length);
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
@@ -478,11 +488,9 @@ cc.Class({
         }
         if (stepUse > 0) {
             stepUse--;
-            if(increase==true)
-            {
+            if (increase == true) {
                 this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            }
-            else{
+            } else {
                 this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
             }
         }
@@ -506,6 +514,23 @@ cc.Class({
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
         let x = this.gap + this.blockSize;
         let y = this.gap + this.blockSize / 2 + this.blockSize * 4.0;
+
+        let ty = y - this.blockSize / 2;
+        for (let i = 0; i < ROWS; i++) {
+            theRows[i] = new Array();
+            theRows[i][0] = ty;
+            ty += this.gap + this.blockSize;
+            theRows[i][1] = ty;
+        }
+
+        let tx = this.gap + this.blockSize / 2;
+        for (let i = 0; i < COLUMNS; i++) {
+            theCol[i] = new Array();
+            theCol[i][0] = tx;
+            tx += this.gap + this.blockSize;
+            theCol[i][1] = tx;
+        }
+
         this.positions = new Array();
         this.blocks = new Array();
         for (let i = 0; i < ROWS; i++) {

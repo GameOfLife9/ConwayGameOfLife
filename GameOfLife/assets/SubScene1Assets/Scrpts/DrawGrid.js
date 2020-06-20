@@ -34,7 +34,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        gap: 0.1,
+        gap: 1,
         //细胞预制件
         blockPrefab: cc.Prefab,
         hasPrefab: cc.Prefab,

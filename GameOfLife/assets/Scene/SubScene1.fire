@@ -60,7 +60,7 @@
     "_is3DNode": true,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "autoReleaseAssets": false,
+    "autoReleaseAssets": true,
     "_id": "b8f50157-123c-47d2-a6d3-086e74d33e0f"
   },
   {
@@ -222,7 +222,7 @@
       "array": [
         0,
         0,
-        269.28369915108715,
+        275.51336804502023,
         0,
         0,
         0,
@@ -6444,7 +6444,7 @@
       "__id__": 2
     },
     "_enabled": true,
-    "gap": 2,
+    "gap": 1,
     "blockPrefab": {
       "__uuid__": "8827ecab-df29-404e-be80-a58351431633"
     },

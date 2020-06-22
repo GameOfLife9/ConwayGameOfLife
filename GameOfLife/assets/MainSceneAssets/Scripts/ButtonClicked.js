@@ -27,6 +27,10 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
+        ButtonAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -36,17 +40,29 @@ cc.Class({
     start () {
         
     },
+    ButtonAudioPlay()
+    {
+        this.ButtonAudio.play();
+    },
     Scene1ChangeButon:function()
     {
+        this.ButtonAudioPlay();
         cc.director.loadScene("SubScene1");       
     },
     Scene3ChangeButon:function()
     {
+        this.ButtonAudioPlay();
         cc.director.loadScene("SubScene3");       
     },
     rankChangeButon:function()
     {
+        this.ButtonAudioPlay();
         cc.director.loadScene("rankScene");       
+    },
+    HelpChangeButon:function()
+    {
+        this.ButtonAudioPlay();
+        cc.director.loadScene("HelpScene");       
     },
     // update (dt) {},
 });

@@ -52,6 +52,14 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        ButtonAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
+        SucessAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
         scrollView: {
             default: null,
             type: cc.ScrollView
@@ -63,6 +71,10 @@ cc.Class({
         node.height = size;
         node.x = x;
         node.y = y;
+    },
+    ButtonAudioPlay()
+    {
+        this.ButtonAudio.play();
     },
     cCzie() {
         let windowSize = cc.view.getVisibleSize();
@@ -157,6 +169,7 @@ cc.Class({
                 this.updateUserRank();
                 this.postDataToWX();
             }
+            this.SucessAudio.play();
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
         } else {

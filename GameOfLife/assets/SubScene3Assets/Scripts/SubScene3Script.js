@@ -39,6 +39,14 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        SetCellAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
+        ButtonAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
         blockPrefab: cc.Prefab,
         hasPrefab: cc.Prefab,
         bg: cc.Node,
@@ -52,8 +60,12 @@ cc.Class({
             default: null,
             type: cc.ScrollView
         },
-    },
 
+    },
+    ButtonAudioPlay()
+    {
+        this.ButtonAudio.play();
+    },
     changeSize(node, size, x, y) {
         node.width = size;
         node.height = size;
@@ -146,9 +158,11 @@ cc.Class({
             if (ExitCell[this.touchi + theI][this.touchj + theJ] == 1) {
                 this.changeHasNotCellSprite(this.touchi + theI, this.touchj + theJ);
                 ExitCell[this.touchi + theI][this.touchj + theJ] = 0;
+                this.SetCellAudio.play();
             } else {
                 this.changeHasCellSprite(this.touchi + theI, this.touchj + theJ);
                 ExitCell[this.touchi + theI][this.touchj + theJ] = 1;
+                this.SetCellAudio.play();
             }
         }
 
@@ -173,7 +187,7 @@ cc.Class({
             for (let j = 0; j < THEMAX; j++) {
                 if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0,);
                 } else {
                     this.changeHasNotCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
@@ -318,7 +332,7 @@ cc.Class({
         this.computeNumAround();
         for (let i = theI; i < theI + ROWS; i++) {
             for (let j = theJ; j < theJ + COLUMNS; j++) {
-                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
+                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j],15*45.0/COLUMNS);
             }
         }
     },

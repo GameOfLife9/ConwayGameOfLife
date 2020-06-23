@@ -64,6 +64,10 @@ cc.Class({
             default: null,
             type: cc.ScrollView
         },
+        SetCellAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
         scrollViewBack: cc.Button,
     },
     changeSize(node, size, x, y) {
@@ -237,6 +241,7 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
+                this.SetCellAudio.play();
                 history[history.length] = lastCells;
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
@@ -252,6 +257,7 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
+                this.SetCellAudio.play();
                 history[history.length] = lastCells;
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;

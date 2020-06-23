@@ -40,6 +40,7 @@ cc.Class({
             {
                 this.canvas.getComponent('DrawGrid').selectLevel(this.num);
                 this.canvas.getComponent('DrawGrid').disableScorollView();
+                this.canvas.getComponent('DrawGrid').ButtonAudioPlay();
             }     
         }, this);
     },

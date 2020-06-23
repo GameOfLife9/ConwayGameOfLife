@@ -37,30 +37,35 @@ cc.Class({
     start () {
 
     },
-    setNumber(number)
+    setNumber(number,labelfrontsize=45)
     {
         if(number==0){
             this.numberLabel.node.active=false;
         }
         else
         {
+            this.numberLabel.fontSize=labelfrontsize;
             this.numberLabel.node.active=true;
             this.numberLabel.string=number;
             if(number==1)
             {
-                this.numberLabel.node.color=cc.color(255,0,0,255);
+                this.numberLabel.node.color=cc.color(255*0.8,0,0,255);
             }
-            if(number==2)
+            else if(number==2)
             {
-                this.numberLabel.node.color=cc.color(0,255,0,255);
+                this.numberLabel.node.color=cc.color(0,255*0.8,0,255);
             }
-            if(number==3)
+            else if(number==3)
             {
-                this.numberLabel.node.color=cc.color(0,0,255,255);
+                this.numberLabel.node.color=cc.color(0,0,255*0.8,255);
             }
-            if(number==4)
+            else if(number==4)
             {
-                this.numberLabel.node.color=cc.color(255,255,0,255);
+                this.numberLabel.node.color=cc.color(255*0.8,255*0.8,0,255);
+            }
+            else
+            {
+                this.numberLabel.node.color=cc.color(0.0,255*0.8,255*0.8,255);
             }
         }
             

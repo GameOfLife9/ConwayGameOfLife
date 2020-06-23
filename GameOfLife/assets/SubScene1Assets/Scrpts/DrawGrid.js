@@ -52,11 +52,27 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        SetCellAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
+        ButtonAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
+        SucessAudio: {
+            type: cc.AudioSource,           
+            default: null          
+        },
         scrollView: {
             default: null,
             type: cc.ScrollView
         },
         scrollViewBack: cc.Button,
+    },
+    ButtonAudioPlay()
+    {
+        this.ButtonAudio.play();
     },
     changeSize(node, size, x, y) {
         node.width = size;
@@ -158,6 +174,7 @@ cc.Class({
                 this.updateUserRank();
                 this.postDataToWX();
             }
+            this.SucessAudio.play();
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
         } else {
@@ -225,13 +242,14 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
+                this.SetCellAudio.play();
                 var obj = {};
                 obj.arr = lastCells;
                 obj.next = 0;
                 history.push(obj);
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+                this.changeLabelString(true);
                 this.changeHasCellSprite(this.touchi, this.touchj);
                 ExitCell[this.touchi][this.touchj] = 1;
             }
@@ -243,13 +261,14 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
+                this.SetCellAudio.play();
                 var obj = {};
                 obj.arr = lastCells;
                 obj.next = 0;
                 history.push(obj);
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+                this.changeLabelString(false);
                 this.changeHasNotCellSprite(this.touchi, this.touchj);
                 ExitCell[this.touchi][this.touchj] = 0;
             }
@@ -260,6 +279,15 @@ cc.Class({
             this.showNum();
         } else {
             this.hideNum();
+        }
+    },
+    changeLabelString(increaseT){
+        if(increaseT == true)
+        {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可创造" + available + "个部落，\n繁荣状态为繁衍" + stepUse + "代后的分布";
+        }
+        else{
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个部落，\n繁荣状态为繁衍" + stepUse + "代后的分布";
         }
     },
     //根据当前的ExitCell更新blocks
@@ -323,11 +351,7 @@ cc.Class({
         available = GridData.availableCell[level];
         stepUse = GridData.stepUse[level];
         increase = GridData.increa[level]
-        if (increase == true) {
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        } else {
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        }
+        this.changeLabelString(increase);
         //载入数据
         for (let k = 0; k < GridData.levelsStart[level].length; k++) {
             let m = GridData.levelsStart[level][k].x;
@@ -428,11 +452,7 @@ cc.Class({
         else if (changed == 2)
             stepUse++;
 
-        if (increase == true) {
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        } else {
-            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-        }
+        this.changeLabelString(increase);
         if (canChange) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
@@ -486,11 +506,7 @@ cc.Class({
     nextGenCell() {
         if (stepUse > 0) {
             stepUse--;
-            if (increase == true) {
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            } else {
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            }
+            this.changeLabelString(increase);
         }
         else return;
         let lastCells = new Array();

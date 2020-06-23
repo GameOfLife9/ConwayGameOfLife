@@ -299,8 +299,8 @@ cc.Class({
             let n = ModelData.modelDatas[modelNum][k].y + centery + theJ;
 
             if (m >= 0 && m < THEMAX && n >= 0 && n < THEMAX) {
-                this.changeHasCellSprite(m, n);
-                ExitCell[m][n] = 1;
+                this.changeHasCellSprite(n, m);
+                ExitCell[n][m] = 1;
             } else {
                 console.log("Function Loadmodel out index");
             }

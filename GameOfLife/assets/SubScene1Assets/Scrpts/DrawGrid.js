@@ -11,7 +11,7 @@ var stepUse = 1;
 var available = 1;
 var increase = true;
 var theRows = new Array(); //鼠标行坐标
-var theCol = new Array();//鼠标列坐标
+var theCol = new Array(); //鼠标列坐标
 //暂时变量，之后删掉
 var display = true;
 //exitcell用于判断格子i j是否有细胞
@@ -23,7 +23,7 @@ for (let i = 0; i < ROWS; i++) {
         ExitCell[i][j] = 0;
     }
 }
-var history = new Array();
+var history = [];
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum = new Array();
 for (let i = 0; i < ROWS; i++) {
@@ -146,6 +146,7 @@ cc.Class({
                         this.isAccmp = false;
                     }
                 }
+                if(this.isAccmp == false) return;
             }
         }
         //如果通关，执行通关操作
@@ -224,7 +225,10 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
-                history[history.length] = lastCells;
+                var obj = {};
+                obj.arr = lastCells;
+                obj.next = 0;
+                history.push(obj);
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
                 this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
@@ -239,13 +243,17 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
-                history[history.length] = lastCells;
+                var obj = {};
+                obj.arr = lastCells;
+                obj.next = 0;
+                history.push(obj);
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
                 this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
                 this.changeHasNotCellSprite(this.touchi, this.touchj);
                 ExitCell[this.touchi][this.touchj] = 0;
             }
+            this.judgeAccom();
         }
 
         if (isshowNum == true) {
@@ -276,17 +284,22 @@ cc.Class({
     },
     //显示或者隐藏通关要求
     displayOrHideReq() {
+        console.log(display);
         if (display) {
             this.ShowRequireButtonLabel.string = "隐藏通关要求"
             for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
                 let m = GridData.levelsEnd[level][k].x;
                 let n = GridData.levelsEnd[level][k].y;
-
-                this.blocks[m][n].color = cc.color(50, 10, 150, 255);
+                this.blocks[m][n]._children[2].active = true;
             }
             display = false;
         } else {
             this.ShowRequireButtonLabel.string = "显示通关要求"
+            for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
+                let m = GridData.levelsEnd[level][k].x;
+                let n = GridData.levelsEnd[level][k].y;
+                this.blocks[m][n]._children[2].active = false;
+            }
             this.updateCells();
             display = true;
         }
@@ -296,7 +309,7 @@ cc.Class({
     loadlevel() {
         //更新当前关卡
         //首先清零
-        history = new Array();
+        history = [];
         console.log("history length in LoadLevel Fun:" + history.length);
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
@@ -391,38 +404,48 @@ cc.Class({
     },
     //返回上一代细胞
     returnLastCell() {
-        let changed = false;
+        let changed = 0;
+        let canChange = 0;
+        var obj = {};
         if (history.length != 0) {
-            for (let i = 0; i < ROWS; i++) {
-                for (let j = 0; j < COLUMNS; j++) {
-                    if (ExitCell[i][j] != history[history.length - 1][i][j])
-                        changed = true;
+            obj = history.pop();
+            canChange = 1;
+            if (obj.next == 0) {
+                for (let i = 0; i < ROWS; i++) {
+                    for (let j = 0; j < COLUMNS; j++) {
+                        if (ExitCell[i][j] != obj.arr[i][j]) {
+                            changed = 1;
+                            break;
+                        }
+                    }
                 }
-            }
+            } else changed = 2;
         }
+        else return;
 
-        if (changed) {
+        if (changed == 1)
             available++;
-        }
+        else if (changed == 2)
+            stepUse++;
 
         if (increase == true) {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
         } else {
             this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
         }
-        if (history.length != 0) {
+        if (canChange) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
-                    ExitCell[i][j] = history[history.length - 1][i][j];
+                    ExitCell[i][j] = obj.arr[i][j];
                 }
             }
             this.updateCells();
         }
-        let arrTemp = new Array();
+        /*let arrTemp = new Array();
         for (let i = 0; i < history.length - 1; i++) {
             arrTemp[i] = history[i];
         }
-        history = arrTemp;
+        history = arrTemp;*/
         console.log("history length in returnLastCell Fun:" + history.length);
     },
     changeHasCellSprite(i, j) {
@@ -461,6 +484,15 @@ cc.Class({
     },
     //生成下一代细胞
     nextGenCell() {
+        if (stepUse > 0) {
+            stepUse--;
+            if (increase == true) {
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            } else {
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            }
+        }
+        else return;
         let lastCells = new Array();
         for (let i = 0; i < ROWS; i++) {
             lastCells[i] = new Array();
@@ -468,7 +500,10 @@ cc.Class({
                 lastCells[i][j] = ExitCell[i][j];
             }
         }
-        history[history.length] = lastCells;
+        var obj = {};
+        obj.arr = lastCells;
+        obj.next = 1;
+        history.push(obj);
         console.log("history length in nextGenCell Fun:" + history.length);
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
@@ -486,29 +521,13 @@ cc.Class({
                 }
             }
         }
-        if (stepUse > 0) {
-            stepUse--;
-            if (increase == true) {
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            } else {
-                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
-            }
-        }
 
         if (isshowNum == true) {
             this.showNum();
         } else {
             this.hideNum();
         }
-        if (stepUse == 0) {
-            if (available > 0) {
-                available--;
-            } else {
-                this.judgeAccom();
-            }
-
-        }
-
+        this.judgeAccom();
     },
     drawGrids() {
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);

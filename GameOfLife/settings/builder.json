@@ -3,9 +3,7 @@
   "packageName": "",
   "startScene": "8d2d956b-9762-4a02-8d77-9b9fca3b9ed3",
   "excludeScenes": [
-    "f8316ccc-a6d4-4923-aca9-62c4b27f4a3a",
-    "0bff46c6-86cb-419e-bf6a-7ebbab740069",
-    "b8f50157-123c-47d2-a6d3-086e74d33e0f"
+    "0bff46c6-86cb-419e-bf6a-7ebbab740069"
   ],
   "includeSDKBox": false,
   "orientation": {

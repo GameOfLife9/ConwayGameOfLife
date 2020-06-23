@@ -129,7 +129,7 @@
     "_id": "cfO7fLx9lJJ5/ExceZAIEv"
   },
   {
-    "__type__": "a76686D7AJKz5yq2EM65DnR",
+    "__type__": "f5642E5mNxJFJWS4rSGhXVA",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -139,7 +139,7 @@
     "bgMusic": {
       "__uuid__": "36cca9eb-2646-45da-8f40-a07b30030040"
     },
-    "_id": "15F9PNLw5FtY4xRZAJqAgX"
+    "_id": "83T0mO4l5GkZrwGDBwzqsx"
   },
   {
     "__type__": "cc.Node",
@@ -273,7 +273,7 @@
       "array": [
         0,
         0,
-        342.2594122880176,
+        342.20155030654007,
         0,
         0,
         0,

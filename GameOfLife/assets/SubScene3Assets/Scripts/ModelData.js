@@ -38,7 +38,7 @@ surviveNums[0]=survive1Num;
 bornNums[0]=born1Num;
 
 modelDatas[0]=model1Data;
-modelName[0] = "横杠对变";
+modelName[0] = "模型1";
 
 
 
@@ -100,7 +100,7 @@ born2Num[1] = 6;
 surviveNums[1]=survive2Num;
 bornNums[1]=born2Num;
 modelDatas[1]=model2Data;
-modelName[1] = "双杆聚合";
+modelName[1] = "模型2";
 
 
 /////////////////////////////////////////////////模型3
@@ -126,7 +126,7 @@ born3Num[1] = 6;
 surviveNums[2] = survive3Num;
 bornNums[2] = born3Num;
 modelDatas[2] = model3Data;
-modelName[2] = "右上推进";
+modelName[2] = "模型3";
 
 
 /////////////////////////////////////////////////模型4
@@ -155,7 +155,7 @@ born4Num[1] = 6;
 surviveNums[3] = survive4Num;
 bornNums[3] = born4Num;
 modelDatas[3] = model4Data;
-modelName[3] = "左下铺路";
+modelName[3] = "模型4";
 
 
 /////////////////////////////////////////////////模型5
@@ -232,7 +232,7 @@ born5Num[0] = 3;
 surviveNums[4] = survive5Num;
 bornNums[4] = born5Num;
 modelDatas[4] = model5Data;
-modelName[4] = "蝶翼上升";
+modelName[4] = "模型5";
 
 
 /////////////////////////////////////////////////模型6
@@ -294,7 +294,7 @@ born6Num[0] = 3;
 surviveNums[5] = survive6Num;
 bornNums[5] = born6Num;
 modelDatas[5] = model6Data;
-modelName[5] = "交换循环";
+modelName[5] = "模型6";
 
 
 /////////////////////////////////////////////////模型7
@@ -329,7 +329,7 @@ born7Num[0] = 3;
 surviveNums[6] = survive7Num;
 bornNums[6] = born7Num;
 modelDatas[6] = model7Data;
-modelName[6] = "分裂蔓延";
+modelName[6] = "模型7";
 
 
 /////////////////////////////////////////////////模型8
@@ -362,7 +362,7 @@ born8Num[1] = 8;
 surviveNums[7] = survive8Num;
 bornNums[7] = born8Num;
 modelDatas[7] = model8Data;
-modelName[7] = "四向发散";
+modelName[7] = "模型8";
 
 
 
@@ -448,7 +448,7 @@ born9Num[0] = 3;
 surviveNums[8] = survive9Num;
 bornNums[8] = born9Num;
 modelDatas[8] = model9Data;
-modelName[8] = "左右传输";
+modelName[8] = "模型9";
 
 /////////////////////////////////////////////////模型10
 //存放模型10分布
@@ -514,7 +514,7 @@ born10Num[1] = 6;
 surviveNums[9] = survive10Num;
 bornNums[9] = born10Num;
 modelDatas[9] = model10Data;
-modelName[9] = "聚散双星";
+modelName[9] = "模型10";
 
 
 exports.modelDatas=modelDatas;

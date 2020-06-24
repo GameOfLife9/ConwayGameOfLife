@@ -38,7 +38,7 @@ cc.Class({
         this.node.on('touchend', function () {
             this.canvas.getComponent('SubScene3Script').loadModel(this.num);
             this.canvas.getComponent('SubScene3Script').disableScorollView();
-            this.canvas.getComponent('SubScene3Script').ButtonAudioPlay();
+            
         }, this);
     },
     setNumAndName(number,name){

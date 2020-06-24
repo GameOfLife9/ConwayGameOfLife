@@ -2,14 +2,6 @@ import * as GridData from 'GridData';
 const ROWS = 15;
 const COLUMNS = 15;
 var isshowNum = false;
-
-//关卡面板上升及下降速度
-var Upspeed1 = 65;
-var Upspeed2 = 5;
-var Downspeed1 = 20;
-var Downspeed2 = 5;
-var LevelTall = 27;
-
 //当前关卡级数，用于loadLevel
 var level = 0;
 //记录时间
@@ -18,9 +10,8 @@ var maxlevel = 0;
 var stepUse = 1;
 var available = 1;
 var increase = true;
-var theTop;
 var theRows = new Array(); //鼠标行坐标
-var theCol = new Array(); //鼠标列坐标
+var theCol = new Array();//鼠标列坐标
 //暂时变量，之后删掉
 var display = true;
 //exitcell用于判断格子i j是否有细胞
@@ -32,7 +23,7 @@ for (let i = 0; i < ROWS; i++) {
         ExitCell[i][j] = 0;
     }
 }
-var history = [];
+var history = new Array();
 //cellNum实时存储细胞ij周围细胞数目
 var CellNum = new Array();
 for (let i = 0; i < ROWS; i++) {
@@ -51,30 +42,15 @@ cc.Class({
         hasPrefab: cc.Prefab,
         bg: cc.Node,
         levelLabel: cc.Label,
-        levelNum: cc.Label,
         canvas: cc.Node,
         showHideNumButton: cc.Button,
         ShowHideButtonLabel: cc.Label,
         ShowRequireButtonLabel: cc.Label,
         SucessSprite: cc.Sprite,
-        nextLevelbtn: cc.Node,
         SucessBackButton: cc.Button,
-        tips: cc.Node,
         itemTemplate: {
             default: null,
             type: cc.Node
-        },
-        SetCellAudio: {
-            type: cc.AudioSource,
-            default: null
-        },
-        ButtonAudio: {
-            type: cc.AudioSource,
-            default: null
-        },
-        SucessAudio: {
-            type: cc.AudioSource,
-            default: null
         },
         scrollView: {
             default: null,
@@ -82,18 +58,13 @@ cc.Class({
         },
         scrollViewBack: cc.Button,
     },
-    ButtonAudioPlay() {
-        this.ButtonAudio.play();
-    },
-    changeSize(node, sizeW, sizeH, x, y) {
-        node.width = sizeW;
-        node.height = sizeH;
+    changeSize(node, size, x, y) {
+        node.width = size;
+        node.height = size;
         node.x = x;
         node.y = y;
     },
     cCzie() {
-        let blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
-        theTop = this.gap + blockSize / 2 + blockSize * 4.0 + (this.gap + blockSize) * ROWS;
         let windowSize = cc.view.getVisibleSize();
         let tWidth = windowSize.width;
         let tHeight = windowSize.height;
@@ -105,59 +76,37 @@ cc.Class({
 
         let tnode = this.node.getChildByName("LastCell_Button");
         tx = dx + tx + btnSize / 2;
-        this.changeSize(tnode, btnSize, btnSize, tx, ty + btsY + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
 
         tnode = this.node.getChildByName("NextGen_Butoon");
         tx = tx + dx + btnSize;
-        this.changeSize(tnode, btnSize, btnSize, tx, ty + btsY + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
 
         tnode = this.node.getChildByName("ShowNum_Button");
         tx = tx + dx + btnSize;
-        this.changeSize(tnode, btnSize, btnSize, tx, ty + btsY + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
 
         tnode = this.node.getChildByName("ShowReq_Button");
         tx = tx + dx + btnSize;
-        this.changeSize(tnode, btnSize, btnSize, tx, ty + btsY + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx, ty + btsY + btnSize / 2);
 
         tx = -tWidth / 2;
         tnode = this.node.getChildByName("Return_Button");
         tx = dx + tx + btnSize / 2;
-        this.changeSize(tnode, btnSize, btnSize, tx - 5, tnode.height - tHeight / 2 + theTop + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx - 5, -ty - btsY - btnSize / 2);
 
         tnode = this.node.getChildByName("SelectLevel_Button");
         tx = dx + tx + btnSize;
         tx = dx + tx + btnSize;
         tx = dx + tx + btnSize;
-        this.changeSize(tnode, btnSize, btnSize, tx + 5, tnode.height - tHeight / 2 + theTop + btnSize / 2);
+        this.changeSize(tnode, btnSize, tx + 5, -ty - btsY - btnSize / 2);
 
-        tnode = this.node.getChildByName("DiscBack");
-        this.changeSize(tnode, btnSize, btnSize, 0, tnode.height * 0.5 - tHeight / 2 + theTop - this.gap - blockSize * 0.5);
     },
     onLoad() {
         this.cCzie();
-        this.canTouch = 1;
-        this.showScoroll = 0;
-        this.showSuccess = 0;
-        this.showDisplay = 1;
-        this.showTipsFlag = 0;
-        this.showTipsTime = 0.0;
-        this.showNumDisplayFlag = 0;
-        this.NoLifeFadeFlag = 0;
-        this.times = -10;
-        this.windowSize = cc.view.getVisibleSize();
-        LevelTall = 0.025 * this.windowSize.height;
-        let theWidth = this.windowSize.width * 2 / 3;
-        let theHeight = theWidth * 65 / 48;
-        this.changeSize(this.scrollView.node, theWidth, theHeight, 0, -this.windowSize.height / 2 - theHeight / 2);
-        this.scrollView.node.active = true;
-        theWidth = this.windowSize.width * 143 / 180;
-        theHeight = theWidth * 511 / 572;
-        this.changeSize(this.SucessSprite.node, theWidth, theHeight, 0, theHeight / 2 + this.windowSize.height / 2);
-        this.SucessSprite.node.active = true;
         var node = cc.director.getScene().getChildByName('userInfo');
         var data = node.getComponent('userInfo').getdata();
         maxlevel = data.rank;
-        level = maxlevel;
     },
     start() {
         this.drawGrids();
@@ -197,7 +146,6 @@ cc.Class({
                         this.isAccmp = false;
                     }
                 }
-                if (this.isAccmp == false) return;
             }
         }
         //如果通关，执行通关操作
@@ -209,7 +157,6 @@ cc.Class({
                 this.updateUserRank();
                 this.postDataToWX();
             }
-            this.SucessAudio.play();
             this.SucessSprite.node.getChildByName("Congratu_Label").getComponent(cc.Label).string = "恭喜通关";
             this.SucessSprite.node.getChildByName("NextLevel_Button").getChildByName("Background").getChildByName("Label").getComponent(cc.Label).string = "下一关"
         } else {
@@ -219,14 +166,16 @@ cc.Class({
         this.accomplish();
     },
     accomplish() {
-        this.NoLifeFadeFlag = 1;
-        this.times = -10;
+
+        this.SucessSprite.node.active = true;
+        this.SucessBackButton.node.active = true;
+
     },
     nextLevelClicked() {
         if (this.isAccmp == true) {
-            this.SucessSprite.node.y = this.SucessSprite.node.height / 2 + this.windowSize.height / 2;
+
+            this.SucessSprite.node.active = false;
             this.SucessBackButton.node.active = false;
-            this.nextLevelbtn.active = false;
             if (level < GridData.levelsEnd.length) {
                 this.loadlevel();
                 time = 0.0;
@@ -235,14 +184,12 @@ cc.Class({
 
             this.SucessSprite.node.active = false;
             this.SucessBackButton.node.active = false;
-            this.nextLevelbtn.active = false;
             this.resStart();
         }
 
     },
     //触摸事件
     touchedEvent(event) {
-        if (this.canTouch == 0) return;
         var touches = event.getTouches();
         var touchLoc = touches[0].getLocation();
 
@@ -263,9 +210,13 @@ cc.Class({
                 break;
             } else break;
         }
+        //this.touchi = Math.floor((touchLoc.x - this.gap - this.blockSize / 2) / (this.blockSize + this.gap));
+
+        //可能存在错误
+        //this.touchj = Math.floor((touchLoc.y - this.gap - this.blockSize * 4.0) / (this.blockSize + this.gap));
 
         if (available > 0 && this.touchj != -1 && this.touchi != -1) {
-            if (ExitCell[this.touchi][this.touchj] == 0) {
+            if (ExitCell[this.touchi][this.touchj] == 0 && increase == true) {
                 let lastCells = new Array();
                 for (let i = 0; i < ROWS; i++) {
                     lastCells[i] = new Array();
@@ -273,17 +224,14 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
-                this.SetCellAudio.play();
-                var obj = {};
-                obj.arr = lastCells;
-                obj.next = 0;
-                history.push(obj);
+                history[history.length] = lastCells;
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
-                this.changeLabelString(true);
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
                 this.changeHasCellSprite(this.touchi, this.touchj);
                 ExitCell[this.touchi][this.touchj] = 1;
-            } else {
+            }
+            if (ExitCell[this.touchi][this.touchj] == 1 && increase == false) {
                 let lastCells = new Array();
                 for (let i = 0; i < ROWS; i++) {
                     lastCells[i] = new Array();
@@ -291,19 +239,13 @@ cc.Class({
                         lastCells[i][j] = ExitCell[i][j];
                     }
                 }
-                this.SetCellAudio.play();
-                var obj = {};
-                obj.arr = lastCells;
-                obj.next = 0;
-                history.push(obj);
+                history[history.length] = lastCells;
                 console.log("history length in touchedEvent Fun:" + history.length);
                 available--;
-                this.changeLabelString(false);
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
                 this.changeHasNotCellSprite(this.touchi, this.touchj);
                 ExitCell[this.touchi][this.touchj] = 0;
             }
-            this.judgeAccom();
-            if (available == 0 && stepUse == 0 && this.isAccmp == false) this.showTips();
         }
 
         if (isshowNum == true) {
@@ -312,20 +254,16 @@ cc.Class({
             this.hideNum();
         }
     },
-    changeLabelString(increaseT) {
-        this.levelNum.string = "第 " + (level + 1) + " 关"
-        this.levelLabel.string = "可改动细胞数: " + available + "\n可迭代繁衍数: " + stepUse;
-    },
     //根据当前的ExitCell更新blocks
     updateCells() {
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
                 if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0, 40);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0);
                 } else {
                     this.changeHasNotCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0, 40);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0);
                 }
             }
         }
@@ -338,33 +276,17 @@ cc.Class({
     },
     //显示或者隐藏通关要求
     displayOrHideReq() {
-        console.log(display);
-        if (this.showDisplay) {
-            if (isshowNum) this.showNumDisplayFlag = 1;
-            this.hideNum();
-            this.showDisplay = 0;
-        } else {
-            if (this.showNumDisplayFlag) this.showNum();
-            else this.hideNum();
-            this.showDisplay = 1;
-            this.showNumDisplayFlag = 0;
-        }
-
         if (display) {
             this.ShowRequireButtonLabel.string = "隐藏通关要求"
             for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
                 let m = GridData.levelsEnd[level][k].x;
                 let n = GridData.levelsEnd[level][k].y;
-                this.blocks[m][n]._children[2].active = true;
+
+                this.blocks[m][n].color = cc.color(50, 10, 150, 255);
             }
             display = false;
         } else {
             this.ShowRequireButtonLabel.string = "显示通关要求"
-            for (let k = 0; k < GridData.levelsEnd[level].length; k++) {
-                let m = GridData.levelsEnd[level][k].x;
-                let n = GridData.levelsEnd[level][k].y;
-                this.blocks[m][n]._children[2].active = false;
-            }
             this.updateCells();
             display = true;
         }
@@ -374,17 +296,13 @@ cc.Class({
     loadlevel() {
         //更新当前关卡
         //首先清零
-        history = [];
-        this.showDisplay = 1;
-        display = true;
+        history = new Array();
         console.log("history length in LoadLevel Fun:" + history.length);
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
                 //this.blocks[i][j].color=cc.color(200,114,114,255);
                 this.changeHasNotCellSprite(i, j);
-                this.blocks[i][j].opacity = 255;
-                this.blocks[i][j]._children[2].active = false;
-                this.blocks[i][j].getComponent('NumText').setNumber(0, 40);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
                 ExitCell[i][j] = 0;
             }
         }
@@ -392,7 +310,11 @@ cc.Class({
         available = GridData.availableCell[level];
         stepUse = GridData.stepUse[level];
         increase = GridData.increa[level]
-        this.changeLabelString(increase);
+        if (increase == true) {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        } else {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
         //载入数据
         for (let k = 0; k < GridData.levelsStart[level].length; k++) {
             let m = GridData.levelsStart[level][k].x;
@@ -407,10 +329,6 @@ cc.Class({
         this.hideNum();
     },
     ShowHideNumButtonFun() {
-        if (this.showDisplay == 0) {
-            this.showNumDisplayFlag = 1 - this.showNumDisplayFlag;
-            return;
-        }
         if (isshowNum == false) {
             this.showNum();
             this.ShowHideButtonLabel.string = "隐藏数字"
@@ -425,7 +343,7 @@ cc.Class({
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
-                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j], 40);
+                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
             }
         }
     },
@@ -438,7 +356,7 @@ cc.Class({
         isshowNum = false;
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLUMNS; j++) {
-                this.blocks[i][j].getComponent('NumText').setNumber(0, 40);
+                this.blocks[i][j].getComponent('NumText').setNumber(0);
             }
         }
     },
@@ -473,54 +391,76 @@ cc.Class({
     },
     //返回上一代细胞
     returnLastCell() {
-        let changed = 0;
-        let canChange = 0;
-        var obj = {};
+        let changed = false;
         if (history.length != 0) {
-            obj = history.pop();
-            canChange = 1;
-            if (obj.next == 0) {
-                for (let i = 0; i < ROWS; i++) {
-                    for (let j = 0; j < COLUMNS; j++) {
-                        if (ExitCell[i][j] != obj.arr[i][j]) {
-                            changed = 1;
-                            break;
-                        }
-                    }
-                }
-            } else changed = 2;
-        } else return;
-
-        if (changed == 1)
-            available++;
-        else if (changed == 2)
-            stepUse++;
-
-        this.changeLabelString(increase);
-        if (canChange) {
             for (let i = 0; i < ROWS; i++) {
                 for (let j = 0; j < COLUMNS; j++) {
-                    ExitCell[i][j] = obj.arr[i][j];
+                    if (ExitCell[i][j] != history[history.length - 1][i][j])
+                        changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            available++;
+        }
+
+        if (increase == true) {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        } else {
+            this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+        }
+        if (history.length != 0) {
+            for (let i = 0; i < ROWS; i++) {
+                for (let j = 0; j < COLUMNS; j++) {
+                    ExitCell[i][j] = history[history.length - 1][i][j];
                 }
             }
             this.updateCells();
         }
+        let arrTemp = new Array();
+        for (let i = 0; i < history.length - 1; i++) {
+            arrTemp[i] = history[i];
+        }
+        history = arrTemp;
         console.log("history length in returnLastCell Fun:" + history.length);
     },
     changeHasCellSprite(i, j) {
+        /*let x = this.positions[i][j].x;
+        let y = this.positions[i][j].y;
+
+        let block = cc.instantiate(this.hasPrefab);
+        block.width = this.blockSize;
+        block.height = this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x, y));
+
+        this.positions[i][j] = cc.v2(x, y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j] = block;*/
         this.blocks[i][j]._children[0].active = false;
         this.blocks[i][j]._children[1].active = true;
     },
     changeHasNotCellSprite(i, j) {
+        /*let x = this.positions[i][j].x;
+        let y = this.positions[i][j].y;
+
+        let block = cc.instantiate(this.blockPrefab);
+        block.width = this.blockSize;
+        block.height = this.blockSize;
+        this.bg.addChild(block);
+        block.setPosition(cc.v2(x, y));
+
+        this.positions[i][j] = cc.v2(x, y);
+
+        this.blocks[i][j].destroy();
+        this.blocks[i][j] = block;*/
         this.blocks[i][j]._children[0].active = true;
         this.blocks[i][j]._children[1].active = false;
     },
     //生成下一代细胞
     nextGenCell() {
-        if (stepUse > 0) {
-            stepUse--;
-            this.changeLabelString(increase);
-        } else return;
         let lastCells = new Array();
         for (let i = 0; i < ROWS; i++) {
             lastCells[i] = new Array();
@@ -528,10 +468,7 @@ cc.Class({
                 lastCells[i][j] = ExitCell[i][j];
             }
         }
-        var obj = {};
-        obj.arr = lastCells;
-        obj.next = 1;
-        history.push(obj);
+        history[history.length] = lastCells;
         console.log("history length in nextGenCell Fun:" + history.length);
         this.computeNumAround();
         for (let i = 0; i < ROWS; i++) {
@@ -549,14 +486,29 @@ cc.Class({
                 }
             }
         }
+        if (stepUse > 0) {
+            stepUse--;
+            if (increase == true) {
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可增加" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            } else {
+                this.levelLabel.string = "Lv:" + (level + 1) + "  本关还可消除" + available + "个细胞，\n目标分布为繁衍" + stepUse + "代后的分布";
+            }
+        }
 
         if (isshowNum == true) {
             this.showNum();
         } else {
             this.hideNum();
         }
-        this.judgeAccom();
-        if (available == 0 && stepUse == 0 && this.isAccmp == false) this.showTips();
+        if (stepUse == 0) {
+            if (available > 0) {
+                available--;
+            } else {
+                this.judgeAccom();
+            }
+
+        }
+
     },
     drawGrids() {
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
@@ -605,6 +557,7 @@ cc.Class({
             y += this.gap + this.blockSize;
             x = this.gap + this.blockSize;
         }
+
         this.loadlevel();
         this.hideNum();
     },
@@ -628,7 +581,7 @@ cc.Class({
         }
     },
     showScorollView() {
-        //this.scrollView.node.active = true;
+        this.scrollView.node.active = true;
         this.scrollViewBack.node.active = true;
         for (let i = 0; i < this.itemNum; i++) {
             if (i < maxlevel + 1) {
@@ -636,16 +589,12 @@ cc.Class({
             } else {
                 this.items[i].getComponent(cc.Button).interactable = false;
             }
+
         }
-        this.showScoroll = 1;
-        this.canTouch = 0;
     },
     //隐藏载入模型列表
     disableScorollView() {
-        this.canTouch = 1;
-        this.showScoroll = 0;
-        this.scrollView.node.x = 0;
-        this.scrollView.node.y = -this.windowSize.height / 2 - this.scrollView.node.height / 2;
+        this.scrollView.node.active = false;
         this.scrollViewBack.node.active = false;
     },
     updateUserRank: function () {
@@ -686,115 +635,7 @@ cc.Class({
             }
         });
     },
-    showTips() {
-        this.showTipsFlag = 1;
-        this.tips.opacity = 0;
-        this.tips.active = true;
-        var action = cc.fadeIn(0.1); //渐显
-        this.tips.runAction(action);
-    },
     update(dt) {
         time += dt;
-        if (this.showScoroll) { //1表示第一次上升，2表示第一次下降，3表示第二次上升，4表示第二次下降
-            let y = this.scrollView.node.y;
-            if (this.showScoroll == 1) {
-                if (y <= LevelTall + 50)
-                    y += Upspeed1;
-                if (y > LevelTall + 50) {
-                    y = LevelTall + 50;
-                    this.showScoroll = 2;
-                }
-            } else if (this.showScoroll == 2) {
-                if (y >= LevelTall - 25)
-                    y -= Downspeed1;
-                if (y < LevelTall - 25) {
-                    y = LevelTall - 25;
-                    this.showScoroll = 3;
-                }
-            } else if (this.showScoroll == 3) {
-                if (y <= LevelTall + 15)
-                    y += Upspeed2;
-                if (y > LevelTall + 15) {
-                    y = LevelTall + 15;
-                    this.showScoroll = 4;
-                }
-            } else if (this.showScoroll == 4) {
-                if (y > LevelTall)
-                    y -= Downspeed2;
-                if (y <= LevelTall) {
-                    y = LevelTall;
-                    this.showScoroll = 0;
-                }
-            }
-            this.scrollView.node.y = y;
-        }
-
-        if (this.showSuccess) { //1表示第一次下降，2表示第一次上升，3表示第二次下降，4表示第二次上升
-            let y = this.SucessSprite.node.y;
-            if (this.showSuccess == 1) {
-                if (y > LevelTall - 50)
-                    y -= Upspeed1;
-                if (y <= LevelTall - 50) {
-                    y = LevelTall - 50;
-                    this.showSuccess = 2;
-                }
-            } else if (this.showSuccess == 2) {
-                if (y < LevelTall + 25)
-                    y += Downspeed1;
-                if (y >= LevelTall + 25) {
-                    y = LevelTall + 25;
-                    this.showSuccess = 3;
-                }
-            } else if (this.showSuccess == 3) {
-                if (y > LevelTall - 15)
-                    y -= Upspeed2;
-                if (y <= LevelTall - 15) {
-                    y = LevelTall - 15;
-                    this.showSuccess = 4;
-                }
-            } else if (this.showSuccess == 4) {
-                if (y < LevelTall)
-                    y += Downspeed2;
-                if (y >= LevelTall) {
-                    y = LevelTall;
-                    this.showSuccess = 0;
-                    this.nextLevelbtn.opacity = 0;
-                    this.nextLevelbtn.active = true;
-                    var action = cc.fadeIn(0.4); //渐显
-                    this.nextLevelbtn.runAction(action);
-                }
-            }
-            this.SucessSprite.node.y = y;
-        }
-
-        if (this.showTipsFlag) {
-            this.showTipsTime += dt;
-            if (this.showTipsTime >= 1.0) {
-                var action = cc.fadeOut(1.0); //渐隐效果
-                this.tips.runAction(action);
-                this.showTipsFlag = 0;
-                this.showTipsTime = 0;
-            }
-        }
-
-        if (this.NoLifeFadeFlag) {
-            this.times++;
-            if (this.times <= 60 && this.times>0) {
-                for (let i = 0; i < ROWS; i++) {
-                    for (let j = 0; j < COLUMNS; j++) {
-                        if (ExitCell[i][j] == 0) {
-                            //console.log(this.blocks[i][j].node);
-                            this.blocks[i][j].opacity -= 4.25;
-                        }
-                    }
-                }
-            }
-            else if(this.times == 90){
-                this.showSuccess = 1;
-                this.SucessBackButton.node.active = true;
-                this.times = -10;
-                this.NoLifeFadeFlag = 0;
-            }
-        }
     },
 });

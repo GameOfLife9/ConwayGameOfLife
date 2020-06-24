@@ -39,6 +39,14 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        SetCellAudio: {
+            type: cc.AudioSource,
+            default: null
+        },
+        ButtonAudio: {
+            type: cc.AudioSource,
+            default: null
+        },
         blockPrefab: cc.Prefab,
         hasPrefab: cc.Prefab,
         bg: cc.Node,
@@ -52,8 +60,11 @@ cc.Class({
             default: null,
             type: cc.ScrollView
         },
-    },
 
+    },
+    /*ButtonAudioPlay() {
+        this.ButtonAudio.play();
+    },*/
     changeSize(node, size, x, y) {
         node.width = size;
         node.height = size;
@@ -137,18 +148,16 @@ cc.Class({
                 break;
             } else break;
         }
-        //this.touchj = Math.floor((touchLoc.x - this.gap) / (this.blockSize + this.gap));
 
-        //可能存在错误
-        //this.touchj=Math.floor((touchLoc.y-this.gap-this.blockSize*4.0)/(this.blockSize+this.gap));
-        // this.touchi = Math.floor((touchLoc.y - cc.winSize.height * 0.15 + this.blockSize / 2.0) / (this.blockSize + this.gap));
         if (this.touchj != -1 && this.touchi != -1) {
             if (ExitCell[this.touchi + theI][this.touchj + theJ] == 1) {
                 this.changeHasNotCellSprite(this.touchi + theI, this.touchj + theJ);
                 ExitCell[this.touchi + theI][this.touchj + theJ] = 0;
+                this.SetCellAudio.play();
             } else {
                 this.changeHasCellSprite(this.touchi + theI, this.touchj + theJ);
                 ExitCell[this.touchi + theI][this.touchj + theJ] = 1;
+                this.SetCellAudio.play();
             }
         }
 
@@ -173,7 +182,7 @@ cc.Class({
             for (let j = 0; j < THEMAX; j++) {
                 if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0);
+                    this.blocks[i][j].getComponent('NumText').setNumber(0, );
                 } else {
                     this.changeHasNotCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
@@ -196,7 +205,7 @@ cc.Class({
             }
         }
     },
-    changeChessSize(){
+    changeChessSize() {
         theI = Math.floor((THEMAX - ROWS) / 2);
         theJ = Math.floor((THEMAX - COLUMNS) / 2);
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
@@ -220,8 +229,8 @@ cc.Class({
         //let y=this.gap+this.blockSize/2+this.blockSize*4.0;
         let y = cc.winSize.height * 0.15;
 
-        for(let i = 0;i<THEMAX;i++){
-            for(let j=0;j<THEMAX;j++){
+        for (let i = 0; i < THEMAX; i++) {
+            for (let j = 0; j < THEMAX; j++) {
                 this.blocks[i][j].x = -1000;
                 this.blocks[i][j].y = 0;
                 this.positions[i][j] = cc.v2(-1000, 0);
@@ -299,8 +308,8 @@ cc.Class({
             let n = ModelData.modelDatas[modelNum][k].y + centery + theJ;
 
             if (m >= 0 && m < THEMAX && n >= 0 && n < THEMAX) {
-                this.changeHasCellSprite(m, n);
-                ExitCell[m][n] = 1;
+                this.changeHasCellSprite(n, m);
+                ExitCell[n][m] = 1;
             } else {
                 console.log("Function Loadmodel out index");
             }
@@ -318,7 +327,7 @@ cc.Class({
         this.computeNumAround();
         for (let i = theI; i < theI + ROWS; i++) {
             for (let j = theJ; j < theJ + COLUMNS; j++) {
-                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j]);
+                this.blocks[i][j].getComponent('NumText').setNumber(CellNum[i][j], 15 * 45.0 / COLUMNS);
             }
         }
     },
@@ -394,6 +403,7 @@ cc.Class({
     },
     //这个函数是初始化棋盘的函数
     drawGrids() {
+
         //动态地设置间隔
         this.gap = 1;
         theI = Math.floor((THEMAX - ROWS) / 2);

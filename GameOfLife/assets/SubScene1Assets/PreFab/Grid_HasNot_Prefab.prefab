@@ -169,7 +169,11 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
+<<<<<<< HEAD
       "__uuid__": "9628fcbf-0363-4849-963c-327de91fa081"
+=======
+      "__uuid__": "7996828d-161a-4911-9d1d-ba2a056d8c53"
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -308,7 +312,11 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
+<<<<<<< HEAD
       "__uuid__": "c647df09-85b8-4a27-bbc9-51bb11d670d3"
+=======
+      "__uuid__": "1fbff1c1-6257-45ad-b6c5-cf8eee2c66a4"
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -387,9 +395,15 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
+<<<<<<< HEAD
       "r": 255,
       "g": 255,
       "b": 255,
+=======
+      "r": 218,
+      "g": 23,
+      "b": 23,
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
       "a": 255
     },
     "_contentSize": {
@@ -447,7 +461,11 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
+<<<<<<< HEAD
       "__uuid__": "dd9cd0fa-92dd-404a-a9fb-d59951b63293"
+=======
+      "__uuid__": "a23235d1-15db-4b95-8439-a2e005bfff91"
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -533,7 +551,11 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
+<<<<<<< HEAD
       "width": 20.02,
+=======
+      "width": 22.25,
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
       "height": 50.4
     },
     "_anchorPoint": {
@@ -586,7 +608,11 @@
     "_useOriginalSize": false,
     "_string": "0",
     "_N$string": "0",
+<<<<<<< HEAD
     "_fontSize": 36,
+=======
+    "_fontSize": 40,
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
     "_lineHeight": 40,
     "_enableWrapText": true,
     "_N$file": null,
@@ -613,8 +639,13 @@
       "__id__": 1
     },
     "_alignFlags": 45,
+<<<<<<< HEAD
     "_left": 39.99,
     "_right": 39.99,
+=======
+    "_left": 38.875,
+    "_right": 38.875,
+>>>>>>> 843da73b58950b6368188aff441af72e54c401f1
     "_top": 24.8,
     "_bottom": 24.8,
     "_verticalCenter": 0,

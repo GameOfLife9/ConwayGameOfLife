@@ -18,9 +18,7 @@ cc.Class({
     },
     onLoad() {
         this.AudioPlayer = cc.find("BackAudioNode").getComponent("audioScript");
-        //停止再开启背景音乐
-        //this.AudioPlayer.stopBgMusic();
-        this.AudioPlayer.playBgMusic();
+        this.AudioPlayer.playBgMusic(); 
         //        this.postDataToWX();
         //三张背景图位置初始化
         //获得当前游戏窗口的高度

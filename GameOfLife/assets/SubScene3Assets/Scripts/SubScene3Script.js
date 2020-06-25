@@ -31,6 +31,9 @@ var timegap = 0.15;
 var ModelIndex = 0;
 var centerx = 0;
 var centery = 0;
+
+var BArr = [3];
+var SArr = [2, 3];
 cc.Class({
     extends: cc.Component,
 
@@ -62,9 +65,9 @@ cc.Class({
         },
 
     },
-    /*ButtonAudioPlay() {
+    ButtonAudioPlay() {
         this.ButtonAudio.play();
-    },*/
+    },
     changeSize(node, size, x, y) {
         node.width = size;
         node.height = size;
@@ -114,9 +117,53 @@ cc.Class({
         tx = dx + tx + btnSize;
         this.changeSize(this.startBtn, btnSize, tx, -ty - btsY - btnSize / 2);
 
-        this.changeSize(this.endBtn, btnSize, tx, -ty - btsY - btnSize / 2);
-    },
+        tx = 0;
+        tnode = this.node.getChildByName("ruleLabel");
+        tnode.width = tWidth / 2;
+        tnode.x = tx;
+        tnode.y = -ty - btsY - btnSize * 2;
 
+        tx = -tWidth / 4;
+        tnode = this.node.getChildByName("BLabel");
+        tnode.width = tWidth / 8;
+        tnode.x = tx;
+        tnode.y = -ty - btsY - btnSize * 3;
+
+        tx += tWidth / 5;
+        tnode = this.node.getChildByName("Beditbox");
+        tnode.width = tWidth / 8;
+        tnode.x = tx;
+        tnode.y = -ty - btsY - btnSize * 3;
+
+        tx += tWidth / 5;
+        tnode = this.node.getChildByName("SLabel");
+        tnode.width = tWidth / 8;
+        tnode.x = tx;
+        tnode.y = -ty - btsY - btnSize * 3;
+
+        tx += tWidth / 5;
+        tnode = this.node.getChildByName("Seditbox");
+        tnode.width = tWidth / 8;
+        tnode.x = tx;
+        tnode.y = -ty - btsY - btnSize * 3;
+
+        this.changeSize(this.endBtn, btnSize, tx, -ty - btsY - btnSize / 2);
+
+    },
+    BtextEditEnd(event) {
+        let BRRR = event._string.split("");
+        BArr = new Array();
+        for (let i = 0; i < BRRR.length; i++) {
+            BArr[i] = parseInt(BRRR[i]);
+        }
+    },
+    StextEditEnd(event) {
+        let SRRR = event._string.split("");
+        SArr = new Array();
+        for (let i = 0; i < SRRR.length; i++) {
+            SArr[i] = parseInt(SRRR[i]);
+        }
+    },
     start() {
         this.drawGrids();
 
@@ -182,7 +229,7 @@ cc.Class({
             for (let j = 0; j < THEMAX; j++) {
                 if (ExitCell[i][j] == 1) {
                     this.changeHasCellSprite(i, j);
-                    this.blocks[i][j].getComponent('NumText').setNumber(0, );
+                    this.blocks[i][j].getComponent('NumText').setNumber(0,);
                 } else {
                     this.changeHasNotCellSprite(i, j);
                     this.blocks[i][j].getComponent('NumText').setNumber(0);
@@ -290,6 +337,7 @@ cc.Class({
         this.loadModel(0);
     },
     loadModel(modelNum) {
+        let self = this;
         ModelIndex = modelNum;
         //设置centerx和centery是因为为了利于缩放，以棋盘中心为原点。
         centerx = Math.floor(ROWS / 2);
@@ -316,7 +364,19 @@ cc.Class({
 
         }
 
+        SArr = ModelData.surviveNums[ModelIndex];
+        BArr = ModelData.bornNums[ModelIndex];
 
+        var ruleString = "生命规则：B";
+        for (let i = 0; i < BArr.length; i++) {
+            ruleString += BArr[i];
+        }
+        ruleString += "/S";
+        for (let i = 0; i < SArr.length; i++) {
+            ruleString += SArr[i];
+        }
+        console.log(ruleString);
+        this.node.getChildByName("ruleLabel").getComponent(cc.Label).string = ruleString;
         this.hideNum();
         //计算初始周围细胞数
         this.computeNumAround();
@@ -375,8 +435,8 @@ cc.Class({
                 if (ExitCell[i][j] == 1) {
                     this.changeHasNotCellSprite(i, j);
                     ExitCell[i][j] = 0;
-                    for (let p = 0; p < ModelData.surviveNums[ModelIndex].length; p++) {
-                        if (CellNum[i][j] == ModelData.surviveNums[ModelIndex][p]) {
+                    for (let p = 0; p < SArr.length; p++) {
+                        if (CellNum[i][j] == SArr[p]) {
                             this.changeHasCellSprite(i, j);
                             ExitCell[i][j] = 1;
                         }
@@ -386,8 +446,8 @@ cc.Class({
 
                 //此处没有细胞，且周围细胞数为等于允许出生数量，则生成一个细胞
                 else {
-                    for (let p = 0; p < ModelData.bornNums[ModelIndex].length; p++) {
-                        if (CellNum[i][j] == ModelData.bornNums[ModelIndex][p]) {
+                    for (let p = 0; p < BArr.length; p++) {
+                        if (CellNum[i][j] == BArr[p]) {
                             this.changeHasCellSprite(i, j);
                             ExitCell[i][j] = 1;
                         }
@@ -405,7 +465,7 @@ cc.Class({
     drawGrids() {
 
         //动态地设置间隔
-        this.gap = 1;
+        this.gap = 30.0 / COLUMNS;
         theI = Math.floor((THEMAX - ROWS) / 2);
         theJ = Math.floor((THEMAX - COLUMNS) / 2);
         this.blockSize = (cc.winSize.width - this.gap * (COLUMNS + 2)) / (COLUMNS + 1);
